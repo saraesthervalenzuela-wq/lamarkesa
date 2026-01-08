@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jewelry Organizer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #d4af37 0%, #f4e4bc 50%, #d4af37 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.95rem;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 15px 25px;
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .stat-value {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.75rem;
+            color: #d4af37;
+            font-weight: 600;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 4px;
+        }
+
+        /* Actions Bar */
+        .actions-bar {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #d4af37 0%, #c9a227 100%);
+            color: #1a1a2e;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-danger {
+            background: rgba(220, 53, 69, 0.2);
+            color: #ff6b6b;
+            border: 1px solid rgba(220, 53, 69, 0.3);
+        }
+
+        .btn-danger:hover {
+            background: rgba(220, 53, 69, 0.3);
+        }
+
+        .btn-ai {
+            background: linear-gradient(135deg, #10a37f 0%, #1a7f5a 100%);
+            color: #fff;
+            border: none;
+        }
+
+        .btn-ai:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 163, 127, 0.4);
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        /* Search & Filter */
+        .search-filter {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            max-width: 350px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 18px 12px 45px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.9rem;
+        }
+
+        .search-box input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: rgba(212, 175, 55, 0.5);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .filter-select {
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .filter-select option {
+            background: #1a1a2e;
+        }
+
+        /* Table List View */
+        .jewelry-table {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .table-header {
+            display: grid;
+            grid-template-columns: 160px 1fr 140px 120px 100px 80px;
+            gap: 10px;
+            padding: 15px 20px;
+            background: rgba(212, 175, 55, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 600;
+        }
+
+        .table-row {
+            display: grid;
+            grid-template-columns: 160px 1fr 140px 120px 100px 80px;
+            gap: 10px;
+            padding: 12px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .table-row:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .table-row:last-child {
+            border-bottom: none;
+        }
+
+        .row-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .row-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .row-image-placeholder {
+            font-size: 1.2rem;
+        }
+
+        .row-image:hover::after {
+            content: '📷';
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .editable-field {
+            background: transparent;
+            border: 1px solid transparent;
+            padding: 8px 10px;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 0.9rem;
+            width: 100%;
+            transition: all 0.2s;
+        }
+
+        .editable-field:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .editable-field:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(212, 175, 55, 0.5);
+        }
+
+        .editable-field.name-field {
+            font-weight: 500;
+        }
+
+        .editable-field.price-field {
+            color: #d4af37;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .editable-field.sku-field {
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .category-select {
+            background: transparent;
+            border: 1px solid transparent;
+            padding: 8px 10px;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .category-select:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .category-select:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(212, 175, 55, 0.5);
+        }
+
+        .category-select option {
+            background: #1a1a2e;
+        }
+
+        .row-actions {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+        }
+
+        .action-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .action-btn:hover {
+            background: rgba(220, 53, 69, 0.2);
+            color: #ff6b6b;
+        }
+
+        /* New Row */
+        .new-row {
+            display: grid;
+            grid-template-columns: 160px 1fr 140px 120px 100px 80px;
+            gap: 10px;
+            padding: 15px 20px;
+            background: rgba(212, 175, 55, 0.05);
+            border-top: 1px dashed rgba(212, 175, 55, 0.3);
+            align-items: center;
+        }
+
+        .new-row .editable-field {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .add-btn {
+            width: 150px;
+            height: 150px;
+            border-radius: 8px;
+            border: 2px dashed rgba(212, 175, 55, 0.4);
+            background: transparent;
+            color: #d4af37;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .add-btn:hover {
+            background: rgba(212, 175, 55, 0.1);
+            border-style: solid;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .empty-state h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Modal (solo para AI Import) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: linear-gradient(135deg, #1e1e3a 0%, #1a1a2e 100%);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            color: #d4af37;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .modal-close:hover {
+            color: #fff;
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .modal-footer {
+            padding: 15px 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.95rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: rgba(212, 175, 55, 0.5);
+        }
+
+        .image-upload {
+            border: 2px dashed rgba(212, 175, 55, 0.3);
+            border-radius: 12px;
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .image-upload:hover {
+            border-color: rgba(212, 175, 55, 0.6);
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        .image-upload-icon {
+            font-size: 2.5rem;
+            color: rgba(212, 175, 55, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .image-upload p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.85rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .table-header,
+            .table-row,
+            .new-row {
+                grid-template-columns: 100px 1fr 100px 80px;
+            }
+            .row-image,
+            .add-btn {
+                width: 90px;
+                height: 90px;
+            }
+            .table-header > *:nth-child(4),
+            .table-header > *:nth-child(5),
+            .table-row > *:nth-child(4),
+            .table-row > *:nth-child(5),
+            .new-row > *:nth-child(4),
+            .new-row > *:nth-child(5) {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            .stats-bar {
+                gap: 10px;
+            }
+            .stat {
+                padding: 12px 18px;
+            }
+            .stat-value {
+                font-size: 1.3rem;
+            }
+            .actions-bar {
+                flex-direction: column;
+            }
+            .btn {
+                justify-content: center;
+            }
+            .table-header,
+            .table-row,
+            .new-row {
+                grid-template-columns: 75px 1fr 90px 60px;
+                padding: 10px 12px;
+                gap: 8px;
+            }
+            .row-image,
+            .add-btn {
+                width: 70px;
+                height: 70px;
+            }
+        }
+
+        /* AI Styles */
+        .ai-spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(16, 163, 127, 0.3);
+            border-top-color: #10a37f;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .ai-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .ai-item-info { flex: 1; }
+        .ai-item-name { color: #fff; font-weight: 500; margin-bottom: 3px; font-size: 0.9rem; }
+        .ai-item-details { color: rgba(255,255,255,0.5); font-size: 0.8rem; }
+        .ai-item-price { color: #d4af37; font-weight: 600; font-size: 1rem; }
+        .ai-item-remove { background: none; border: none; color: rgba(255,255,255,0.3); cursor: pointer; padding: 5px; margin-left: 8px; }
+        .ai-item-remove:hover { color: #ff6b6b; }
+        .sheet-checkbox { display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; cursor: pointer; transition: all 0.2s; font-size: 0.85rem; }
+        .sheet-checkbox:hover { background: rgba(255,255,255,0.1); }
+        .sheet-checkbox.selected { background: rgba(16, 163, 127, 0.2); border-color: #10a37f; }
+        .sheet-checkbox input { accent-color: #10a37f; }
+
+        /* Hidden file input */
+        .hidden-input { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>💎 Jewelry Organizer</h1>
+            <p>Manage your inventory - click any field to edit</p>
+        </header>
+
+        <div class="stats-bar">
+            <div class="stat">
+                <div class="stat-value" id="totalItems">0</div>
+                <div class="stat-label">Total Pieces</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="totalValue">$0</div>
+                <div class="stat-label">Total Value</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="avgPrice">$0</div>
+                <div class="stat-label">Average Price</div>
+            </div>
+        </div>
+
+        <div class="actions-bar">
+            <button class="btn btn-ai" onclick="openAIImportModal()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729z"/>
+                </svg>
+                AI Import
+            </button>
+            <button class="btn btn-secondary" onclick="document.getElementById('excelInput').click()">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                </svg>
+                Import Excel
+            </button>
+            <input type="file" id="excelInput" class="hidden-input" accept=".xlsx,.xls,.csv" onchange="importFromExcel(event)">
+            <button class="btn btn-secondary" onclick="exportToCSV()">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                </svg>
+                Export CSV
+            </button>
+            <button class="btn btn-secondary" onclick="exportToJSON()">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                    <path d="M14 2v6h6"/>
+                </svg>
+                Export JSON
+            </button>
+            <button class="btn btn-danger" onclick="clearAll()">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                </svg>
+                Clear All
+            </button>
+        </div>
+
+        <div class="search-filter">
+            <div class="search-box">
+                <svg class="search-icon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="8"/>
+                    <path d="M21 21l-4.35-4.35"/>
+                </svg>
+                <input type="text" id="searchInput" placeholder="Search by name or SKU..." oninput="filterJewelry()">
+            </div>
+            <select class="filter-select" id="categoryFilter" onchange="filterJewelry()">
+                <option value="">All Categories</option>
+                <option value="rings">Rings</option>
+                <option value="necklaces">Necklaces</option>
+                <option value="earrings">Earrings</option>
+                <option value="bracelets">Bracelets</option>
+                <option value="watches">Watches</option>
+                <option value="other">Other</option>
+            </select>
+            <select class="filter-select" id="sortFilter" onchange="filterJewelry()">
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="name">Name A-Z</option>
+            </select>
+        </div>
+
+        <!-- Table List View -->
+        <div class="jewelry-table" id="jewelryTable">
+            <div class="table-header">
+                <div>Image</div>
+                <div>Name</div>
+                <div>Category</div>
+                <div>SKU</div>
+                <div>Price</div>
+                <div>Actions</div>
+            </div>
+            <div id="jewelryList">
+                <!-- Rows will be inserted here -->
+            </div>
+            <!-- New Item Row -->
+            <div class="new-row">
+                <button class="add-btn" onclick="addNewItem()" title="Add new item">+</button>
+                <input type="text" class="editable-field name-field" id="newName" placeholder="New jewelry name..." onkeypress="handleNewKeypress(event)">
+                <select class="category-select" id="newCategory">
+                    <option value="rings">Rings</option>
+                    <option value="necklaces">Necklaces</option>
+                    <option value="earrings">Earrings</option>
+                    <option value="bracelets">Bracelets</option>
+                    <option value="watches">Watches</option>
+                    <option value="other">Other</option>
+                </select>
+                <input type="text" class="editable-field sku-field" id="newSKU" placeholder="SKU">
+                <input type="number" class="editable-field price-field" id="newPrice" placeholder="0.00" step="0.01" onkeypress="handleNewKeypress(event)">
+                <button class="btn btn-primary btn-small" onclick="addNewItem()">Add</button>
+            </div>
+        </div>
+
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <div class="empty-icon">💍</div>
+            <h3>No jewelry yet</h3>
+            <p>Start by adding items using the row above or import from Excel</p>
+        </div>
+    </div>
+
+    <!-- Hidden file input for image uploads -->
+    <input type="file" id="imageUploadInput" class="hidden-input" accept="image/*">
+
+    <script>
+        // Data Storage
+        let jewelry = JSON.parse(localStorage.getItem('jewelry')) || [];
+        let currentEditingImageId = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderJewelry();
+            updateStats();
+
+            // Image upload handler
+            document.getElementById('imageUploadInput').addEventListener('change', handleImageUpload);
+        });
+
+        // Render List
+        function renderJewelry(items = null) {
+            const displayItems = items || jewelry;
+            const list = document.getElementById('jewelryList');
+            const emptyState = document.getElementById('emptyState');
+            const table = document.getElementById('jewelryTable');
+
+            if (jewelry.length === 0) {
+                emptyState.style.display = 'block';
+            } else {
+                emptyState.style.display = 'none';
+            }
+
+            if (displayItems.length === 0 && jewelry.length > 0) {
+                list.innerHTML = '<div style="padding: 30px; text-align: center; color: rgba(255,255,255,0.5);">No items match your search</div>';
+                return;
+            }
+
+            list.innerHTML = displayItems.map(item => `
+                <div class="table-row" data-id="${item.id}">
+                    <div class="row-image" onclick="triggerImageUpload(${item.id})">
+                        ${item.image
+                            ? `<img src="${item.image}" alt="${item.name}">`
+                            : `<span class="row-image-placeholder">💎</span>`
+                        }
+                    </div>
+                    <input type="text" class="editable-field name-field" value="${escapeHtml(item.name)}" onchange="updateField(${item.id}, 'name', this.value)">
+                    <select class="category-select" onchange="updateField(${item.id}, 'category', this.value)">
+                        <option value="rings" ${item.category === 'rings' ? 'selected' : ''}>Rings</option>
+                        <option value="necklaces" ${item.category === 'necklaces' ? 'selected' : ''}>Necklaces</option>
+                        <option value="earrings" ${item.category === 'earrings' ? 'selected' : ''}>Earrings</option>
+                        <option value="bracelets" ${item.category === 'bracelets' ? 'selected' : ''}>Bracelets</option>
+                        <option value="watches" ${item.category === 'watches' ? 'selected' : ''}>Watches</option>
+                        <option value="other" ${item.category === 'other' ? 'selected' : ''}>Other</option>
+                    </select>
+                    <input type="text" class="editable-field sku-field" value="${escapeHtml(item.sku || '')}" placeholder="-" onchange="updateField(${item.id}, 'sku', this.value)">
+                    <input type="number" class="editable-field price-field" value="${item.price}" step="0.01" onchange="updateField(${item.id}, 'price', parseFloat(this.value) || 0)">
+                    <div class="row-actions">
+                        <button class="action-btn" onclick="deleteJewelry(${item.id})" title="Delete">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Escape HTML for security
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Update Field
+        function updateField(id, field, value) {
+            const index = jewelry.findIndex(j => j.id === id);
+            if (index !== -1) {
+                jewelry[index][field] = value;
+                saveData();
+                if (field === 'price') {
+                    updateStats();
+                }
+            }
+        }
+
+        // Add New Item
+        function addNewItem() {
+            const name = document.getElementById('newName').value.trim();
+            const category = document.getElementById('newCategory').value;
+            const sku = document.getElementById('newSKU').value.trim();
+            const price = parseFloat(document.getElementById('newPrice').value) || 0;
+
+            if (!name) {
+                document.getElementById('newName').focus();
+                return;
+            }
+
+            const newItem = {
+                id: Date.now(),
+                name,
+                category,
+                price,
+                sku,
+                image: '',
+                createdAt: new Date().toISOString()
+            };
+
+            jewelry.unshift(newItem);
+            saveData();
+            renderJewelry();
+            updateStats();
+
+            // Clear inputs
+            document.getElementById('newName').value = '';
+            document.getElementById('newSKU').value = '';
+            document.getElementById('newPrice').value = '';
+            document.getElementById('newName').focus();
+        }
+
+        // Handle Enter key in new row
+        function handleNewKeypress(event) {
+            if (event.key === 'Enter') {
+                addNewItem();
+            }
+        }
+
+        // Image Upload
+        function triggerImageUpload(id) {
+            currentEditingImageId = id;
+            document.getElementById('imageUploadInput').click();
+        }
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file || !currentEditingImageId) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const index = jewelry.findIndex(j => j.id === currentEditingImageId);
+                if (index !== -1) {
+                    jewelry[index].image = e.target.result;
+                    saveData();
+                    renderJewelry();
+                }
+                currentEditingImageId = null;
+            };
+            reader.readAsDataURL(file);
+            event.target.value = '';
+        }
+
+        // Delete Jewelry
+        function deleteJewelry(id) {
+            if (confirm('Delete this item?')) {
+                jewelry = jewelry.filter(j => j.id !== id);
+                saveData();
+                renderJewelry();
+                updateStats();
+            }
+        }
+
+        // Update Stats
+        function updateStats() {
+            const total = jewelry.length;
+            const totalValue = jewelry.reduce((sum, item) => sum + (item.price || 0), 0);
+            const avgPrice = total > 0 ? totalValue / total : 0;
+
+            document.getElementById('totalItems').textContent = total;
+            document.getElementById('totalValue').textContent = '$' + totalValue.toLocaleString('en-US', { minimumFractionDigits: 0 });
+            document.getElementById('avgPrice').textContent = '$' + avgPrice.toLocaleString('en-US', { minimumFractionDigits: 0 });
+        }
+
+        // Filter and Sort
+        function filterJewelry() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const category = document.getElementById('categoryFilter').value;
+            const sort = document.getElementById('sortFilter').value;
+
+            let filtered = jewelry.filter(item => {
+                const matchesSearch = item.name.toLowerCase().includes(search) ||
+                                     (item.sku && item.sku.toLowerCase().includes(search));
+                const matchesCategory = !category || item.category === category;
+                return matchesSearch && matchesCategory;
+            });
+
+            switch (sort) {
+                case 'newest':
+                    filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                    break;
+                case 'oldest':
+                    filtered.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+                    break;
+                case 'price-high':
+                    filtered.sort((a, b) => b.price - a.price);
+                    break;
+                case 'price-low':
+                    filtered.sort((a, b) => a.price - b.price);
+                    break;
+                case 'name':
+                    filtered.sort((a, b) => a.name.localeCompare(b.name));
+                    break;
+            }
+
+            renderJewelry(filtered);
+        }
+
+        // Save to LocalStorage
+        function saveData() {
+            localStorage.setItem('jewelry', JSON.stringify(jewelry));
+        }
+
+        // Export to CSV
+        function exportToCSV() {
+            if (jewelry.length === 0) {
+                alert('No jewelry to export');
+                return;
+            }
+
+            const headers = ['Name', 'Category', 'Price', 'SKU', 'Date'];
+            const rows = jewelry.map(item => [
+                `"${item.name}"`,
+                item.category,
+                item.price,
+                item.sku || '',
+                new Date(item.createdAt).toLocaleDateString('en-US')
+            ]);
+
+            const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+            downloadFile(csv, 'jewelry.csv', 'text/csv');
+        }
+
+        // Export to JSON
+        function exportToJSON() {
+            if (jewelry.length === 0) {
+                alert('No jewelry to export');
+                return;
+            }
+
+            const data = jewelry.map(({ id, image, ...rest }) => rest);
+            const json = JSON.stringify(data, null, 2);
+            downloadFile(json, 'jewelry.json', 'application/json');
+        }
+
+        // Download Helper
+        function downloadFile(content, filename, type) {
+            const blob = new Blob([content], { type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Import from Excel (simple)
+        function importFromExcel(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[sheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+                    if (jsonData.length === 0) {
+                        alert('No data found in file');
+                        return;
+                    }
+
+                    // Auto-detect columns and import
+                    let imported = 0;
+                    const cols = Object.keys(jsonData[0]);
+                    const nameCol = cols.find(c => /name|nombre|item|producto|description/i.test(c));
+                    const priceCol = cols.find(c => /price|precio|cost|costo|value/i.test(c));
+
+                    jsonData.forEach(row => {
+                        const name = row[nameCol] || row[cols[0]];
+                        let price = row[priceCol] || 0;
+                        if (typeof price === 'string') {
+                            price = parseFloat(price.replace(/[^0-9.-]/g, '')) || 0;
+                        }
+
+                        if (name) {
+                            jewelry.unshift({
+                                id: Date.now() + Math.random(),
+                                name: String(name).trim(),
+                                category: 'other',
+                                price: price,
+                                sku: '',
+                                image: '',
+                                createdAt: new Date().toISOString()
+                            });
+                            imported++;
+                        }
+                    });
+
+                    saveData();
+                    renderJewelry();
+                    updateStats();
+                    alert(`Imported ${imported} items!`);
+                } catch (error) {
+                    alert('Error reading file: ' + error.message);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+            event.target.value = '';
+        }
+
+        // Clear All
+        function clearAll() {
+            if (jewelry.length === 0) return;
+            if (confirm('Delete ALL items? This cannot be undone.')) {
+                jewelry = [];
+                saveData();
+                renderJewelry();
+                updateStats();
+            }
+        }
+
+        // ============================================
+        // AI IMPORT MODULE (OpenAI)
+        // ============================================
+
+        let openaiApiKey = localStorage.getItem('openaiApiKey') || '';
+        let excelWorkbook = null;
+        let selectedSheets = [];
+
+        function openAIImportModal() {
+            const modalHTML = `
+                <div class="modal-overlay active" id="aiModal" onclick="if(event.target.id==='aiModal')closeAIModal()">
+                    <div class="modal">
+                        <div class="modal-header">
+                            <h2 style="background: linear-gradient(135deg, #10a37f 0%, #1a7f5a 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">OpenAI Import</h2>
+                            <button class="modal-close" onclick="closeAIModal()">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <p style="color: rgba(255,255,255,0.6); margin-bottom: 18px; font-size: 0.9rem;">
+                                Upload Excel with multiple sheets or paste text. AI will extract jewelry data automatically.
+                            </p>
+
+                            <div class="form-group">
+                                <label>OpenAI API Key (<a href="https://platform.openai.com/api-keys" target="_blank" style="color: #10a37f;">get one here</a>)</label>
+                                <input type="password" id="openaiKey" placeholder="sk-..." value="${openaiApiKey}" style="font-family: monospace;">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Upload File</label>
+                                <div class="image-upload" onclick="document.getElementById('aiFileInput').click()">
+                                    <input type="file" id="aiFileInput" class="hidden-input" accept=".xlsx,.xls,.csv,.txt,.json" onchange="handleAIFileUpload(event)">
+                                    <div id="aiUploadPlaceholder">
+                                        <div class="image-upload-icon">📊</div>
+                                        <p>Click to upload Excel, CSV, or text file</p>
+                                    </div>
+                                    <div id="aiFileName" style="display: none; color: #d4af37; padding: 15px;"></div>
+                                </div>
+                            </div>
+
+                            <div id="sheetSelector" style="display: none; margin-bottom: 18px;">
+                                <label style="display: block; margin-bottom: 8px; color: rgba(255,255,255,0.7); font-size: 0.85rem;">Select Sheets:</label>
+                                <div id="sheetList" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Data Preview / Paste Text</label>
+                                <textarea id="aiTextInput" placeholder="Paste data here or upload a file..." style="height: 140px; font-family: monospace; font-size: 0.8rem;"></textarea>
+                            </div>
+
+                            <div id="aiStatus" style="display: none; background: rgba(16, 163, 127, 0.1); border-radius: 8px; padding: 12px; margin-top: 12px;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div class="ai-spinner"></div>
+                                    <span id="aiStatusText" style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">Analyzing...</span>
+                                </div>
+                            </div>
+
+                            <div id="aiResults" style="display: none; margin-top: 18px;">
+                                <h3 style="color: #d4af37; margin-bottom: 12px; font-size: 1rem;">Found <span id="aiResultCount">0</span> Items:</h3>
+                                <div id="aiResultsList" style="max-height: 250px; overflow-y: auto;"></div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" onclick="closeAIModal()">Cancel</button>
+                            <button class="btn btn-ai" id="aiAnalyzeBtn" onclick="analyzeWithAI()">Analyze with AI</button>
+                            <button class="btn btn-primary" id="aiImportBtn" onclick="importAIResults()" style="display: none;">Import Items</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+        }
+
+        function closeAIModal() {
+            const modal = document.getElementById('aiModal');
+            if (modal) modal.remove();
+            window.aiParsedData = null;
+            excelWorkbook = null;
+            selectedSheets = [];
+        }
+
+        function handleAIFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const fileName = document.getElementById('aiFileName');
+            const placeholder = document.getElementById('aiUploadPlaceholder');
+            const sheetSelector = document.getElementById('sheetSelector');
+            const sheetList = document.getElementById('sheetList');
+
+            fileName.textContent = '📄 ' + file.name;
+            fileName.style.display = 'block';
+            placeholder.style.display = 'none';
+
+            const reader = new FileReader();
+
+            if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+                reader.onload = (e) => {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        excelWorkbook = XLSX.read(data, { type: 'array' });
+                        const sheetNames = excelWorkbook.SheetNames;
+
+                        if (sheetNames.length > 1) {
+                            sheetSelector.style.display = 'block';
+                            selectedSheets = [...sheetNames];
+
+                            sheetList.innerHTML = sheetNames.map((name, idx) => `
+                                <label class="sheet-checkbox selected" id="sheetLabel${idx}">
+                                    <input type="checkbox" checked onchange="toggleSheet('${name}', ${idx})">
+                                    <span>${name}</span>
+                                </label>
+                            `).join('');
+
+                            updateTextFromSheets();
+                        } else {
+                            sheetSelector.style.display = 'none';
+                            selectedSheets = sheetNames;
+                            document.getElementById('aiTextInput').value = XLSX.utils.sheet_to_csv(excelWorkbook.Sheets[sheetNames[0]]);
+                        }
+                    } catch (err) {
+                        alert('Error reading file');
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            } else {
+                reader.onload = (e) => {
+                    document.getElementById('aiTextInput').value = e.target.result;
+                    sheetSelector.style.display = 'none';
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function toggleSheet(sheetName, idx) {
+            const label = document.getElementById('sheetLabel' + idx);
+            if (selectedSheets.includes(sheetName)) {
+                selectedSheets = selectedSheets.filter(s => s !== sheetName);
+                label.classList.remove('selected');
+            } else {
+                selectedSheets.push(sheetName);
+                label.classList.add('selected');
+            }
+            updateTextFromSheets();
+        }
+
+        function updateTextFromSheets() {
+            if (!excelWorkbook || selectedSheets.length === 0) {
+                document.getElementById('aiTextInput').value = '';
+                return;
+            }
+
+            let allData = '';
+            selectedSheets.forEach(sheetName => {
+                const worksheet = excelWorkbook.Sheets[sheetName];
+                allData += `\n=== ${sheetName} ===\n${XLSX.utils.sheet_to_csv(worksheet)}\n`;
+            });
+            document.getElementById('aiTextInput').value = allData.trim();
+        }
+
+        async function analyzeWithAI() {
+            const apiKey = document.getElementById('openaiKey').value.trim();
+            const textInput = document.getElementById('aiTextInput').value.trim();
+
+            if (!apiKey) { alert('Please enter your OpenAI API key'); return; }
+            if (!textInput) { alert('Please upload a file or paste data'); return; }
+
+            localStorage.setItem('openaiApiKey', apiKey);
+            openaiApiKey = apiKey;
+
+            document.getElementById('aiStatus').style.display = 'block';
+            document.getElementById('aiResults').style.display = 'none';
+            document.getElementById('aiAnalyzeBtn').disabled = true;
+            document.getElementById('aiStatusText').textContent = 'Analyzing with GPT-4...';
+
+            const systemPrompt = `Extract jewelry items from this data. Return ONLY a JSON array with objects containing:
+- name: string (jewelry name)
+- price: number (price as number, 0 if not found)
+- category: string (rings, necklaces, earrings, bracelets, watches, or other)
+- sku: string (code/SKU if found, or empty)
+
+Process ALL sheets. Skip headers. Return ONLY valid JSON array, no explanation.`;
+
+            try {
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+                    body: JSON.stringify({
+                        model: 'gpt-4o-mini',
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            { role: 'user', content: textInput }
+                        ],
+                        temperature: 0.1,
+                        max_tokens: 16000
+                    })
+                });
+
+                const data = await response.json();
+                if (data.error) throw new Error(data.error.message);
+
+                let resultText = data.choices[0].message.content;
+                resultText = resultText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+                const parsedItems = JSON.parse(resultText);
+
+                if (!Array.isArray(parsedItems) || parsedItems.length === 0) {
+                    throw new Error('No items found');
+                }
+
+                window.aiParsedData = parsedItems;
+                document.getElementById('aiStatus').style.display = 'none';
+                document.getElementById('aiResults').style.display = 'block';
+                document.getElementById('aiResultCount').textContent = parsedItems.length;
+                document.getElementById('aiImportBtn').style.display = 'inline-flex';
+
+                const cats = { rings: 'Ring', necklaces: 'Necklace', earrings: 'Earrings', bracelets: 'Bracelet', watches: 'Watch', other: 'Other' };
+
+                document.getElementById('aiResultsList').innerHTML = parsedItems.map((item, i) => `
+                    <div class="ai-item" id="aiItem${i}">
+                        <div class="ai-item-info">
+                            <div class="ai-item-name">${item.name}</div>
+                            <div class="ai-item-details">${cats[item.category] || 'Other'}${item.sku ? ' • ' + item.sku : ''}</div>
+                        </div>
+                        <div class="ai-item-price">$${(item.price || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
+                        <button class="ai-item-remove" onclick="removeAIItem(${i})">✕</button>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                document.getElementById('aiStatus').style.display = 'block';
+                document.getElementById('aiStatusText').innerHTML = `<span style="color: #ff6b6b;">Error: ${error.message}</span>`;
+            }
+
+            document.getElementById('aiAnalyzeBtn').disabled = false;
+        }
+
+        function removeAIItem(index) {
+            if (window.aiParsedData) {
+                window.aiParsedData.splice(index, 1);
+                document.getElementById('aiItem' + index).remove();
+                document.getElementById('aiResultCount').textContent = window.aiParsedData.length;
+                if (window.aiParsedData.length === 0) {
+                    document.getElementById('aiResults').style.display = 'none';
+                    document.getElementById('aiImportBtn').style.display = 'none';
+                }
+            }
+        }
+
+        function importAIResults() {
+            if (!window.aiParsedData || window.aiParsedData.length === 0) return;
+
+            window.aiParsedData.forEach(item => {
+                jewelry.unshift({
+                    id: Date.now() + Math.random(),
+                    name: item.name || 'Unnamed',
+                    category: item.category || 'other',
+                    price: parseFloat(item.price) || 0,
+                    sku: item.sku || '',
+                    image: '',
+                    createdAt: new Date().toISOString()
+                });
+            });
+
+            saveData();
+            renderJewelry();
+            updateStats();
+            closeAIModal();
+            alert(`Imported ${window.aiParsedData.length} items!`);
+        }
+    </script>
+</body>
+</html>
