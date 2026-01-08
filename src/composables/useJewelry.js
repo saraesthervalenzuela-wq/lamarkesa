@@ -121,12 +121,18 @@ export function useJewelry() {
   const deleteJewelry = async (id, imageUrl) => {
     try {
       // Eliminar imagen si existe
-      if (imageUrl) {
+      if (imageUrl && imageUrl.includes('firebase')) {
         try {
-          const imageRef = storageRef(storage, imageUrl)
-          await deleteObject(imageRef)
+          // Extraer el path de la URL de Firebase Storage
+          const url = new URL(imageUrl)
+          const pathMatch = url.pathname.match(/\/o\/(.+)\?/)
+          if (pathMatch) {
+            const path = decodeURIComponent(pathMatch[1])
+            const imageRef = storageRef(storage, path)
+            await deleteObject(imageRef)
+          }
         } catch (e) {
-          console.log('Image not found or already deleted')
+          console.log('Image not found or already deleted:', e.message)
         }
       }
       await deleteDoc(doc(db, 'jewelry', id))

@@ -186,7 +186,7 @@ const getCategoryLabel = (category) => {
               </div>
               <button
                 class="grid-delete-btn"
-                @click="emit('delete', item.id, item.image)"
+                @click="confirm('¿Eliminar este producto?') && emit('delete', item.id, item.image)"
                 title="Eliminar"
               >
                 🗑️
