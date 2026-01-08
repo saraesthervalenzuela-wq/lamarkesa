@@ -1,6 +1,13 @@
 <script setup>
 import { ref } from 'vue'
 
+defineProps({
+  gridMode: {
+    type: Boolean,
+    default: false
+  }
+})
+
 const emit = defineEmits(['add'])
 
 const name = ref('')
@@ -9,12 +16,12 @@ const sku = ref('')
 const price = ref('')
 
 const categories = [
-  { value: 'rings', label: 'Rings' },
-  { value: 'necklaces', label: 'Necklaces' },
-  { value: 'earrings', label: 'Earrings' },
-  { value: 'bracelets', label: 'Bracelets' },
-  { value: 'watches', label: 'Watches' },
-  { value: 'other', label: 'Other' }
+  { value: 'rings', label: 'Anillos' },
+  { value: 'necklaces', label: 'Collares' },
+  { value: 'earrings', label: 'Aretes' },
+  { value: 'bracelets', label: 'Pulseras' },
+  { value: 'watches', label: 'Relojes' },
+  { value: 'other', label: 'Otros' }
 ]
 
 const addItem = () => {
@@ -42,14 +49,55 @@ const handleKeypress = (event) => {
 </script>
 
 <template>
-  <div class="new-row">
+  <!-- Grid Mode -->
+  <div v-if="gridMode" class="grid-add-form">
+    <div class="grid-add-icon">+</div>
+    <h4>Agregar Producto</h4>
+
+    <input
+      type="text"
+      class="grid-input"
+      v-model="name"
+      placeholder="Nombre del producto..."
+      @keypress="handleKeypress"
+    />
+
+    <select class="grid-select" v-model="category">
+      <option v-for="cat in categories" :key="cat.value" :value="cat.value">
+        {{ cat.label }}
+      </option>
+    </select>
+
+    <input
+      type="text"
+      class="grid-input"
+      v-model="sku"
+      placeholder="SKU (opcional)"
+    />
+
+    <input
+      type="number"
+      class="grid-input grid-price"
+      v-model="price"
+      placeholder="Precio"
+      step="0.01"
+      @keypress="handleKeypress"
+    />
+
+    <button class="grid-add-btn" @click="addItem">
+      Agregar
+    </button>
+  </div>
+
+  <!-- List Mode (Table Row) -->
+  <div v-else class="new-row">
     <button class="add-btn" @click="addItem" title="Add new item">+</button>
 
     <input
       type="text"
       class="editable-field name-field"
       v-model="name"
-      placeholder="New jewelry name..."
+      placeholder="Nombre del producto..."
       @keypress="handleKeypress"
     >
 
@@ -75,11 +123,92 @@ const handleKeypress = (event) => {
       @keypress="handleKeypress"
     >
 
-    <button class="btn btn-primary btn-small" @click="addItem">Add</button>
+    <button class="btn btn-primary btn-small" @click="addItem">Agregar</button>
   </div>
 </template>
 
 <style scoped>
+/* Grid Mode Styles */
+.grid-add-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 25px;
+  gap: 12px;
+  width: 100%;
+}
+
+.grid-add-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px dashed rgba(183, 152, 72, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: #B79848;
+  margin-bottom: 5px;
+}
+
+.grid-add-form h4 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  color: #666;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.grid-input,
+.grid-select {
+  width: 100%;
+  padding: 12px 14px;
+  background: #fff;
+  border: 1px solid #E8E8E8;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #333;
+  transition: all 0.2s;
+}
+
+.grid-input:focus,
+.grid-select:focus {
+  outline: none;
+  border-color: #B79848;
+  box-shadow: 0 0 0 3px rgba(183, 152, 72, 0.1);
+}
+
+.grid-input::placeholder {
+  color: #bbb;
+}
+
+.grid-price {
+  color: #B79848;
+  font-weight: 600;
+}
+
+.grid-add-btn {
+  width: 100%;
+  padding: 14px;
+  background: #B79848;
+  color: #fff;
+  border: none;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.grid-add-btn:hover {
+  background: #A08640;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(183, 152, 72, 0.25);
+}
+
+/* List Mode (Table Row) Styles */
 .new-row {
   display: grid;
   grid-template-columns: 180px 1fr 180px 160px 140px 100px;
@@ -219,6 +348,10 @@ const handleKeypress = (event) => {
   .add-btn {
     width: 70px;
     height: 70px;
+  }
+
+  .grid-add-form {
+    padding: 20px 15px;
   }
 }
 </style>

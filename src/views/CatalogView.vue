@@ -12,32 +12,24 @@ const {
 } = useJewelry()
 
 const viewMode = ref('grid') // 'grid' or 'list'
-const showWhatsAppModal = ref(false)
-const selectedProduct = ref(null)
+const showLightbox = ref(false)
+const lightboxProduct = ref(null)
+
+const openLightbox = (product) => {
+  if (product.image) {
+    lightboxProduct.value = product
+    showLightbox.value = true
+  }
+}
+
+const closeLightbox = () => {
+  showLightbox.value = false
+  lightboxProduct.value = null
+}
 
 onMounted(() => {
   initializeListener()
 })
-
-const openWhatsApp = (product) => {
-  selectedProduct.value = product
-  showWhatsAppModal.value = true
-}
-
-const sendWhatsApp = () => {
-  if (!selectedProduct.value) return
-
-  const message = `Hola! Me interesa este producto:\n\n${selectedProduct.value.name}\nPrecio: $${selectedProduct.value.price}\n\n¿Podrías darme más información?`
-
-  // Reemplaza con tu número de WhatsApp (formato internacional sin +)
-  const phoneNumber = '1234567890' // TODO: Configura tu número aquí
-
-  const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
-  window.open(url, '_blank')
-
-  showWhatsAppModal.value = false
-  selectedProduct.value = null
-}
 
 // Categorías para el filtro
 const categories = [
@@ -130,6 +122,7 @@ const getCategoryLabel = (category) => {
         v-for="item in filteredJewelry"
         :key="item.id"
         class="product-card"
+        @click="openLightbox(item)"
       >
         <div class="product-image">
           <img
@@ -144,6 +137,14 @@ const getCategoryLabel = (category) => {
           <div class="product-category">
             {{ getCategoryLabel(item.category) }}
           </div>
+          <div v-if="item.image" class="zoom-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="M21 21l-4.35-4.35"/>
+              <line x1="11" y1="8" x2="11" y2="14"/>
+              <line x1="8" y1="11" x2="14" y2="11"/>
+            </svg>
+          </div>
         </div>
 
         <div class="product-info">
@@ -151,12 +152,6 @@ const getCategoryLabel = (category) => {
           <p v-if="item.sku" class="product-sku">SKU: {{ item.sku }}</p>
           <div class="product-footer">
             <span class="product-price">${{ item.price?.toFixed(2) || '0.00' }}</span>
-            <button @click="openWhatsApp(item)" class="whatsapp-btn">
-              <svg viewBox="0 0 24 24" width="18" height="18">
-                <path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-              </svg>
-              Preguntar
-            </button>
           </div>
         </div>
       </div>
@@ -168,6 +163,7 @@ const getCategoryLabel = (category) => {
         v-for="item in filteredJewelry"
         :key="item.id"
         class="list-item"
+        @click="openLightbox(item)"
       >
         <div class="list-image">
           <img
@@ -190,13 +186,6 @@ const getCategoryLabel = (category) => {
         </div>
 
         <div class="list-price">${{ item.price?.toFixed(2) || '0.00' }}</div>
-
-        <button @click="openWhatsApp(item)" class="whatsapp-btn whatsapp-btn-list">
-          <svg viewBox="0 0 24 24" width="18" height="18">
-            <path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-          </svg>
-          Preguntar
-        </button>
       </div>
     </div>
 
@@ -205,20 +194,15 @@ const getCategoryLabel = (category) => {
       <p>No se encontraron productos</p>
     </div>
 
-    <!-- WhatsApp Modal -->
-    <div v-if="showWhatsAppModal" class="modal-overlay" @click="showWhatsAppModal = false">
-      <div class="modal-content" @click.stop>
-        <h3>Consultar por WhatsApp</h3>
-        <p v-if="selectedProduct">
-          ¿Deseas consultar sobre <strong>{{ selectedProduct.name }}</strong>?
-        </p>
-        <div class="modal-actions">
-          <button @click="showWhatsAppModal = false" class="btn-cancel">
-            Cancelar
-          </button>
-          <button @click="sendWhatsApp" class="btn-confirm">
-            Abrir WhatsApp
-          </button>
+    <!-- Lightbox Modal -->
+    <div v-if="showLightbox && lightboxProduct" class="lightbox-overlay" @click="closeLightbox">
+      <div class="lightbox-content" @click.stop>
+        <button class="lightbox-close" @click="closeLightbox">&times;</button>
+        <img :src="lightboxProduct.image" :alt="lightboxProduct.name" class="lightbox-image">
+        <div class="lightbox-info">
+          <h3>{{ lightboxProduct.name }}</h3>
+          <p v-if="lightboxProduct.sku">SKU: {{ lightboxProduct.sku }}</p>
+          <p class="lightbox-price">${{ lightboxProduct.price?.toFixed(2) || '0.00' }}</p>
         </div>
       </div>
     </div>
@@ -406,6 +390,27 @@ const getCategoryLabel = (category) => {
   text-transform: uppercase;
 }
 
+.zoom-icon {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #B79848;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.product-image:hover .zoom-icon {
+  opacity: 1;
+}
+
 .product-info {
   padding: 22px;
 }
@@ -426,9 +431,6 @@ const getCategoryLabel = (category) => {
 }
 
 .product-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-top: 15px;
   padding-top: 15px;
   border-top: 1px solid #F0F0F0;
@@ -438,26 +440,6 @@ const getCategoryLabel = (category) => {
   font-size: 1.4rem;
   font-weight: 600;
   color: #B79848;
-}
-
-.whatsapp-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 18px;
-  background: #25D366;
-  color: white;
-  border: none;
-  border-radius: 25px;
-  font-size: 0.85rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.whatsapp-btn:hover {
-  background: #20bd5a;
-  transform: scale(1.05);
 }
 
 /* Products List */
@@ -479,6 +461,7 @@ const getCategoryLabel = (category) => {
   padding: 15px 25px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
   transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .list-item:hover {
@@ -556,10 +539,6 @@ const getCategoryLabel = (category) => {
   text-align: right;
 }
 
-.whatsapp-btn-list {
-  flex-shrink: 0;
-}
-
 /* Empty State */
 .empty-state {
   text-align: center;
@@ -569,74 +548,77 @@ const getCategoryLabel = (category) => {
   font-weight: 300;
 }
 
-/* Modal */
-.modal-overlay {
+/* Lightbox */
+.lightbox-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 1001;
+  padding: 20px;
 }
 
-.modal-content {
-  background: #fff;
-  border-radius: 16px;
-  padding: 35px;
-  max-width: 400px;
-  width: 90%;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
-}
-
-.modal-content h3 {
-  color: #333;
-  margin-bottom: 15px;
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.5rem;
-}
-
-.modal-content p {
-  color: #666;
-  margin-bottom: 25px;
-  line-height: 1.6;
-}
-
-.modal-actions {
+.lightbox-content {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
   display: flex;
-  gap: 12px;
-  justify-content: flex-end;
+  flex-direction: column;
+  align-items: center;
 }
 
-.btn-cancel,
-.btn-confirm {
-  padding: 12px 24px;
+.lightbox-close {
+  position: absolute;
+  top: -50px;
+  right: 0;
+  background: none;
   border: none;
-  border-radius: 25px;
-  font-weight: 500;
+  color: #fff;
+  font-size: 3rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: color 0.2s;
+  z-index: 1002;
+  line-height: 1;
 }
 
-.btn-cancel {
-  background: #F5F5F5;
-  color: #666;
+.lightbox-close:hover {
+  color: #B79848;
 }
 
-.btn-cancel:hover {
-  background: #EBEBEB;
+.lightbox-image {
+  max-width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
 }
 
-.btn-confirm {
-  background: #25D366;
-  color: white;
+.lightbox-info {
+  margin-top: 25px;
+  text-align: center;
+  color: #fff;
 }
 
-.btn-confirm:hover {
-  background: #20bd5a;
+.lightbox-info h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.8rem;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.lightbox-info p {
+  color: rgba(255, 255, 255, 0.7);
+  margin: 4px 0;
+  font-size: 0.9rem;
+}
+
+.lightbox-price {
+  color: #B79848 !important;
+  font-size: 1.5rem !important;
+  font-weight: 600;
+  margin-top: 10px !important;
 }
 
 /* Responsive */
@@ -681,11 +663,6 @@ const getCategoryLabel = (category) => {
     font-size: 1.15rem;
   }
 
-  .whatsapp-btn {
-    padding: 8px 14px;
-    font-size: 0.8rem;
-  }
-
   /* List responsive */
   .list-item {
     flex-wrap: wrap;
@@ -711,11 +688,6 @@ const getCategoryLabel = (category) => {
     min-width: auto;
     flex: 1;
     text-align: left;
-  }
-
-  .whatsapp-btn-list {
-    width: 100%;
-    justify-content: center;
   }
 }
 </style>
