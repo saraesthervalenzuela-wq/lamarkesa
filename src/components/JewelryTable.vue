@@ -64,10 +64,10 @@ const emit = defineEmits(['add', 'update', 'delete', 'upload-image'])
   width: 100%;
   background: #fff;
   border-radius: 12px;
-  border: 1px solid rgba(183, 152, 72, 0.12);
+  border: none;
   overflow: hidden;
   margin-bottom: 30px;
-  box-shadow: 0 4px 20px rgba(183, 152, 72, 0.06);
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.06);
 }
 
 .table-header {

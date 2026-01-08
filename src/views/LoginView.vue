@@ -145,17 +145,17 @@ const goToCatalog = () => {
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background: linear-gradient(180deg, #FFFBF7 0%, #FFF5EE 50%, #FDF8F3 100%);
+  background: #F5F0EB;
 }
 
 .login-box {
   width: 100%;
   max-width: 450px;
   background: #fff;
-  border: 1px solid rgba(183, 152, 72, 0.15);
+  border: none;
   border-radius: 16px;
   padding: 50px 40px;
-  box-shadow: 0 10px 40px rgba(183, 152, 72, 0.08);
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
 }
 
 .logo {

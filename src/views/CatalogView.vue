@@ -164,7 +164,7 @@ const getCategoryLabel = (category) => {
 <style scoped>
 .catalog-container {
   min-height: 100vh;
-  background: linear-gradient(180deg, #FFFBF7 0%, #FFF9F5 50%, #FDF8F3 100%);
+  background: #F5F0EB;
   padding: 20px;
   color: #333;
 }
@@ -272,11 +272,12 @@ const getCategoryLabel = (category) => {
 
 .product-card {
   background: #fff;
-  border: 1px solid rgba(183, 152, 72, 0.12);
+  border: none;
   border-radius: 12px;
   overflow: hidden;
   transition: all 0.3s ease;
   cursor: pointer;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 
 .product-card:hover {

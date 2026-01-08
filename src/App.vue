@@ -85,7 +85,7 @@ const goToHome = () => {
 
 body {
   font-family: 'Montserrat', sans-serif;
-  background: linear-gradient(180deg, #FFFBF7 0%, #FFF9F5 50%, #FDF8F3 100%);
+  background: #F5F0EB;
   min-height: 100vh;
   color: #333;
 }
@@ -96,9 +96,9 @@ body {
 
 /* Navigation */
 .navbar {
-  background: rgba(255, 255, 255, 0.95);
-  border-bottom: 1px solid rgba(183, 152, 72, 0.2);
-  backdrop-filter: blur(10px);
+  background: #fff;
+  border-bottom: 1px solid rgba(183, 152, 72, 0.15);
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.04);
   position: sticky;
   top: 0;
   z-index: 100;
