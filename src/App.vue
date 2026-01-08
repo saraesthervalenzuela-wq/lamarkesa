@@ -1,76 +1,58 @@
 <script setup>
-import { useAuth } from './composables/useAuth'
 import { useRouter, useRoute } from 'vue-router'
-import { computed } from 'vue'
-import UserAuth from './components/UserAuth.vue'
 
-const { user, loading } = useAuth()
 const router = useRouter()
 const route = useRoute()
-
-// Rutas que no deben mostrar el navbar
-const hideNavbar = computed(() => {
-  return route.path === '/' || route.path === '/devs'
-})
-
-const goToAdmin = () => {
-  router.push('/admin')
-}
 
 const goToCatalog = () => {
   router.push('/catalog')
 }
 
-const goToHome = () => {
-  router.push('/')
+const goToEdit = () => {
+  router.push('/edit')
+}
+
+const goToAdmin = () => {
+  router.push('/admin')
 }
 </script>
 
 <template>
   <div id="app">
-    <!-- Navigation Bar (oculto en login y devs) -->
-    <nav v-if="!hideNavbar" class="navbar">
+    <nav class="navbar">
       <div class="nav-content">
+        <div class="nav-brand">
+          <span class="brand-icon">💎</span>
+          <span class="brand-text">La Markesa</span>
+        </div>
+
         <div class="nav-links">
           <button
-            @click="goToHome"
-            :class="{ active: route.path === '/' }"
-            class="nav-btn"
-          >
-            Inicio
-          </button>
-          <button
             @click="goToCatalog"
-            :class="{ active: route.path === '/catalog' }"
+            :class="{ active: route.path === '/catalog' || route.path === '/' }"
             class="nav-btn"
           >
             Catálogo
           </button>
           <button
-            v-if="user"
+            @click="goToEdit"
+            :class="{ active: route.path === '/edit' }"
+            class="nav-btn"
+          >
+            Editar
+          </button>
+          <button
             @click="goToAdmin"
             :class="{ active: route.path === '/admin' }"
-            class="nav-btn"
+            class="nav-btn nav-btn-admin"
           >
             Admin
           </button>
         </div>
-
-        <!-- User Auth Component -->
-        <div class="nav-auth">
-          <UserAuth />
-        </div>
       </div>
     </nav>
 
-    <!-- Router View -->
-    <router-view v-if="!loading" />
-
-    <!-- Loading State -->
-    <div v-else class="loading-screen">
-      <div class="spinner"></div>
-      <p>Cargando...</p>
-    </div>
+    <router-view />
   </div>
 </template>
 
@@ -113,9 +95,27 @@ body {
   align-items: center;
 }
 
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-icon {
+  font-size: 1.5rem;
+}
+
+.brand-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #B79848;
+  letter-spacing: 1px;
+}
+
 .nav-links {
   display: flex;
-  gap: 15px;
+  gap: 12px;
 }
 
 .nav-btn {
@@ -143,46 +143,16 @@ body {
   color: #fff;
 }
 
-.nav-auth {
-  display: flex;
-  align-items: center;
-}
-
-/* Loading Screen */
-.loading-screen {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: calc(100vh - 80px);
-}
-
-.spinner {
-  width: 50px;
-  height: 50px;
-  border: 3px solid rgba(183, 152, 72, 0.2);
-  border-top-color: #B79848;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 20px;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.loading-screen p {
-  color: #999;
-  font-weight: 300;
-  letter-spacing: 1px;
+.nav-btn-admin {
+  border-color: rgba(183, 152, 72, 0.6);
 }
 
 /* Responsive */
 @media (max-width: 768px) {
   .nav-content {
-    padding: 15px 20px;
+    padding: 12px 20px;
     flex-direction: column;
-    gap: 15px;
+    gap: 12px;
   }
 
   .nav-links {
@@ -193,6 +163,12 @@ body {
   .nav-btn {
     flex: 1;
     text-align: center;
+    padding: 10px 16px;
+    font-size: 0.85rem;
+  }
+
+  .brand-text {
+    font-size: 1.3rem;
   }
 }
 </style>

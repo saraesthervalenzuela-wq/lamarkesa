@@ -56,12 +56,6 @@ const getCategoryLabel = (category) => {
 
 <template>
   <div class="catalog-container">
-    <!-- Header -->
-    <header class="catalog-header">
-      <h1>💎 Catálogo de Joyería</h1>
-      <p>Encuentra la pieza perfecta para ti</p>
-    </header>
-
     <!-- Filters -->
     <div class="filters">
       <div class="filter-group">
@@ -165,31 +159,8 @@ const getCategoryLabel = (category) => {
 .catalog-container {
   min-height: 100vh;
   background: #F5F0EB;
-  padding: 20px;
+  padding: 30px 20px;
   color: #333;
-}
-
-.catalog-header {
-  text-align: center;
-  padding: 50px 20px;
-  border-bottom: 1px solid rgba(183, 152, 72, 0.15);
-  margin-bottom: 40px;
-}
-
-.catalog-header h1 {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 2.8rem;
-  font-weight: 600;
-  color: #B79848;
-  margin-bottom: 12px;
-  letter-spacing: 3px;
-}
-
-.catalog-header p {
-  color: #999;
-  font-size: 1rem;
-  font-weight: 300;
-  letter-spacing: 1px;
 }
 
 /* Filters */

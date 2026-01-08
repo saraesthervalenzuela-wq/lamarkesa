@@ -240,11 +240,6 @@ const handleAssignPhotos = async (assignments) => {
 
 <template>
   <div class="admin-container">
-    <header class="header">
-      <h1>💎 Jewelry Organizer - Admin</h1>
-      <p>Manage your inventory - click any field to edit</p>
-    </header>
-
     <StatsBar :stats="stats" />
 
     <ActionsBar
@@ -300,39 +295,12 @@ const handleAssignPhotos = async (assignments) => {
 .admin-container {
   max-width: 1800px;
   margin: 0 auto;
-  padding: 20px 40px;
-}
-
-.header {
-  text-align: center;
-  padding: 40px 20px;
-  border-bottom: 1px solid rgba(183, 152, 72, 0.15);
-  margin-bottom: 30px;
-}
-
-.header h1 {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 2.5rem;
-  font-weight: 600;
-  color: #B79848;
-  margin-bottom: 10px;
-  letter-spacing: 2px;
-}
-
-.header p {
-  color: #999;
-  font-size: 0.95rem;
-  font-weight: 300;
-  letter-spacing: 0.5px;
+  padding: 30px 40px;
 }
 
 @media (max-width: 600px) {
-  .header h1 {
-    font-size: 1.8rem;
-  }
-
   .admin-container {
-    padding: 15px 20px;
+    padding: 20px 15px;
   }
 }
 </style>
