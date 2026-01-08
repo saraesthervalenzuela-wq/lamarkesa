@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useJewelry } from '../composables/useJewelry'
 
 const {
@@ -11,6 +11,7 @@ const {
   sortBy
 } = useJewelry()
 
+const viewMode = ref('grid') // 'grid' or 'list'
 const showWhatsAppModal = ref(false)
 const selectedProduct = ref(null)
 
@@ -41,10 +42,11 @@ const sendWhatsApp = () => {
 // Categorías para el filtro
 const categories = [
   { value: '', label: 'Todas las categorías' },
-  { value: 'ring', label: 'Anillos' },
-  { value: 'necklace', label: 'Collares' },
-  { value: 'bracelet', label: 'Pulseras' },
-  { value: 'earring', label: 'Aretes' },
+  { value: 'rings', label: 'Anillos' },
+  { value: 'necklaces', label: 'Collares' },
+  { value: 'bracelets', label: 'Pulseras' },
+  { value: 'earrings', label: 'Aretes' },
+  { value: 'watches', label: 'Relojes' },
   { value: 'other', label: 'Otros' }
 ]
 
@@ -58,7 +60,7 @@ const getCategoryLabel = (category) => {
   <div class="catalog-container">
     <!-- Filters -->
     <div class="filters">
-      <div class="filter-group">
+      <div class="filter-group search-group">
         <input
           v-model="searchQuery"
           type="text"
@@ -84,6 +86,36 @@ const getCategoryLabel = (category) => {
           <option value="name">Nombre A-Z</option>
         </select>
       </div>
+
+      <!-- View Toggle -->
+      <div class="view-toggle">
+        <button
+          :class="['toggle-btn', { active: viewMode === 'grid' }]"
+          @click="viewMode = 'grid'"
+          title="Vista Grid"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"/>
+            <rect x="14" y="3" width="7" height="7"/>
+            <rect x="3" y="14" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/>
+          </svg>
+        </button>
+        <button
+          :class="['toggle-btn', { active: viewMode === 'list' }]"
+          @click="viewMode = 'list'"
+          title="Vista Lista"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="8" y1="6" x2="21" y2="6"/>
+            <line x1="8" y1="12" x2="21" y2="12"/>
+            <line x1="8" y1="18" x2="21" y2="18"/>
+            <line x1="3" y1="6" x2="3.01" y2="6"/>
+            <line x1="3" y1="12" x2="3.01" y2="12"/>
+            <line x1="3" y1="18" x2="3.01" y2="18"/>
+          </svg>
+        </button>
+      </div>
     </div>
 
     <!-- Loading -->
@@ -92,8 +124,8 @@ const getCategoryLabel = (category) => {
       <p>Cargando productos...</p>
     </div>
 
-    <!-- Products Grid -->
-    <div v-else-if="filteredJewelry.length > 0" class="products-grid">
+    <!-- Products Grid View -->
+    <div v-else-if="filteredJewelry.length > 0 && viewMode === 'grid'" class="products-grid">
       <div
         v-for="item in filteredJewelry"
         :key="item.id"
@@ -127,6 +159,44 @@ const getCategoryLabel = (category) => {
             </button>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Products List View -->
+    <div v-else-if="filteredJewelry.length > 0 && viewMode === 'list'" class="products-list">
+      <div
+        v-for="item in filteredJewelry"
+        :key="item.id"
+        class="list-item"
+      >
+        <div class="list-image">
+          <img
+            v-if="item.image"
+            :src="item.image"
+            :alt="item.name"
+            loading="lazy"
+          />
+          <div v-else class="no-image-list">
+            <span>💎</span>
+          </div>
+        </div>
+
+        <div class="list-info">
+          <div class="list-header">
+            <h3 class="list-name">{{ item.name || 'Sin nombre' }}</h3>
+            <span class="list-category">{{ getCategoryLabel(item.category) }}</span>
+          </div>
+          <p v-if="item.sku" class="list-sku">SKU: {{ item.sku }}</p>
+        </div>
+
+        <div class="list-price">${{ item.price?.toFixed(2) || '0.00' }}</div>
+
+        <button @click="openWhatsApp(item)" class="whatsapp-btn whatsapp-btn-list">
+          <svg viewBox="0 0 24 24" width="18" height="18">
+            <path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+          </svg>
+          Preguntar
+        </button>
       </div>
     </div>
 
@@ -171,11 +241,16 @@ const getCategoryLabel = (category) => {
   max-width: 1400px;
   margin: 0 auto 40px;
   padding: 0 20px;
+  align-items: center;
 }
 
 .filter-group {
+  min-width: 180px;
+}
+
+.search-group {
   flex: 1;
-  min-width: 200px;
+  max-width: 350px;
 }
 
 .search-input,
@@ -204,6 +279,38 @@ const getCategoryLabel = (category) => {
 .filter-select option {
   background: #fff;
   color: #333;
+}
+
+/* View Toggle */
+.view-toggle {
+  display: flex;
+  gap: 5px;
+  background: #fff;
+  padding: 5px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.toggle-btn {
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #999;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggle-btn:hover {
+  color: #B79848;
+}
+
+.toggle-btn.active {
+  background: #B79848;
+  color: #fff;
 }
 
 /* Loading */
@@ -353,6 +460,106 @@ const getCategoryLabel = (category) => {
   transform: scale(1.05);
 }
 
+/* Products List */
+.products-list {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 15px 25px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+}
+
+.list-item:hover {
+  box-shadow: 0 8px 25px rgba(183, 152, 72, 0.12);
+  transform: translateX(5px);
+}
+
+.list-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #F9F9F9;
+}
+
+.list-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.no-image-list {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: #ddd;
+}
+
+.list-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.list-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.list-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.list-category {
+  background: #B79848;
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.list-sku {
+  font-size: 0.8rem;
+  color: #aaa;
+  letter-spacing: 0.5px;
+}
+
+.list-price {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #B79848;
+  min-width: 120px;
+  text-align: right;
+}
+
+.whatsapp-btn-list {
+  flex-shrink: 0;
+}
+
 /* Empty State */
 .empty-state {
   text-align: center;
@@ -434,8 +641,23 @@ const getCategoryLabel = (category) => {
 
 /* Responsive */
 @media (max-width: 768px) {
-  .catalog-header h1 {
-    font-size: 2rem;
+  .filters {
+    gap: 10px;
+  }
+
+  .filter-group {
+    min-width: 140px;
+    flex: 1;
+  }
+
+  .search-group {
+    width: 100%;
+    max-width: none;
+    order: -1;
+  }
+
+  .view-toggle {
+    margin-left: auto;
   }
 
   .products-grid {
@@ -462,6 +684,38 @@ const getCategoryLabel = (category) => {
   .whatsapp-btn {
     padding: 8px 14px;
     font-size: 0.8rem;
+  }
+
+  /* List responsive */
+  .list-item {
+    flex-wrap: wrap;
+    padding: 15px;
+    gap: 15px;
+  }
+
+  .list-image {
+    width: 80px;
+    height: 80px;
+  }
+
+  .list-info {
+    flex: 1 1 calc(100% - 100px);
+  }
+
+  .list-name {
+    font-size: 1.1rem;
+  }
+
+  .list-price {
+    font-size: 1.2rem;
+    min-width: auto;
+    flex: 1;
+    text-align: left;
+  }
+
+  .whatsapp-btn-list {
+    width: 100%;
+    justify-content: center;
   }
 }
 </style>
