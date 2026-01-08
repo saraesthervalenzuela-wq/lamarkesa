@@ -162,36 +162,34 @@ const getCategoryLabel = (category) => {
 </template>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
-
 .catalog-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+  background: linear-gradient(180deg, #FFFBF7 0%, #FFF9F5 50%, #FDF8F3 100%);
   padding: 20px;
-  color: #fff;
+  color: #333;
 }
 
 .catalog-header {
   text-align: center;
-  padding: 40px 20px;
-  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  padding: 50px 20px;
+  border-bottom: 1px solid rgba(183, 152, 72, 0.15);
   margin-bottom: 40px;
 }
 
 .catalog-header h1 {
-  font-family: 'Playfair Display', serif;
-  font-size: 2.5rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, #d4af37 0%, #f4e4bc 50%, #d4af37 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 10px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.8rem;
+  font-weight: 600;
+  color: #B79848;
+  margin-bottom: 12px;
+  letter-spacing: 3px;
 }
 
 .catalog-header p {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 1.1rem;
+  color: #999;
+  font-size: 1rem;
+  font-weight: 300;
+  letter-spacing: 1px;
 }
 
 /* Filters */
@@ -212,29 +210,29 @@ const getCategoryLabel = (category) => {
 .search-input,
 .filter-select {
   width: 100%;
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(212, 175, 55, 0.3);
+  padding: 14px 18px;
+  background: #fff;
+  border: 1px solid #E8E8E8;
   border-radius: 8px;
-  color: #fff;
+  color: #333;
   font-size: 0.95rem;
   outline: none;
   transition: all 0.3s ease;
 }
 
 .search-input::placeholder {
-  color: rgba(255, 255, 255, 0.4);
+  color: #bbb;
 }
 
 .search-input:focus,
 .filter-select:focus {
-  border-color: #d4af37;
-  background: rgba(255, 255, 255, 0.12);
+  border-color: #B79848;
+  box-shadow: 0 0 0 3px rgba(183, 152, 72, 0.1);
 }
 
 .filter-select option {
-  background: #16213e;
-  color: #fff;
+  background: #fff;
+  color: #333;
 }
 
 /* Loading */
@@ -246,8 +244,8 @@ const getCategoryLabel = (category) => {
 .spinner {
   width: 50px;
   height: 50px;
-  border: 4px solid rgba(212, 175, 55, 0.2);
-  border-top-color: #d4af37;
+  border: 3px solid rgba(183, 152, 72, 0.2);
+  border-top-color: #B79848;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 20px;
@@ -255,6 +253,11 @@ const getCategoryLabel = (category) => {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+.loading p {
+  color: #999;
+  font-weight: 300;
 }
 
 /* Products Grid */
@@ -268,8 +271,8 @@ const getCategoryLabel = (category) => {
 }
 
 .product-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(212, 175, 55, 0.2);
+  background: #fff;
+  border: 1px solid rgba(183, 152, 72, 0.12);
   border-radius: 12px;
   overflow: hidden;
   transition: all 0.3s ease;
@@ -278,15 +281,14 @@ const getCategoryLabel = (category) => {
 
 .product-card:hover {
   transform: translateY(-5px);
-  border-color: #d4af37;
-  box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2);
+  box-shadow: 0 15px 40px rgba(183, 152, 72, 0.12);
 }
 
 .product-image {
   position: relative;
   width: 100%;
-  height: 280px;
-  background: rgba(0, 0, 0, 0.3);
+  height: 300px;
+  background: #F9F9F9;
   overflow: hidden;
 }
 
@@ -294,6 +296,11 @@ const getCategoryLabel = (category) => {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.product-card:hover .product-image img {
+  transform: scale(1.05);
 }
 
 .no-image {
@@ -303,36 +310,40 @@ const getCategoryLabel = (category) => {
   align-items: center;
   justify-content: center;
   font-size: 4rem;
-  opacity: 0.3;
+  color: #ddd;
 }
 
 .product-category {
   position: absolute;
   top: 12px;
   right: 12px;
-  background: rgba(212, 175, 55, 0.9);
-  color: #1a1a2e;
-  padding: 6px 12px;
+  background: #B79848;
+  color: #fff;
+  padding: 6px 14px;
   border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .product-info {
-  padding: 20px;
+  padding: 22px;
 }
 
 .product-name {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.3rem;
-  color: #d4af37;
-  margin-bottom: 8px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 6px;
 }
 
 .product-sku {
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.8rem;
+  color: #aaa;
   margin-bottom: 15px;
+  letter-spacing: 0.5px;
 }
 
 .product-footer {
@@ -340,12 +351,14 @@ const getCategoryLabel = (category) => {
   justify-content: space-between;
   align-items: center;
   margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #F0F0F0;
 }
 
 .product-price {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #d4af37;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #B79848;
 }
 
 .whatsapp-btn {
@@ -356,9 +369,9 @@ const getCategoryLabel = (category) => {
   background: #25D366;
   color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 600;
+  border-radius: 25px;
+  font-size: 0.85rem;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -372,8 +385,9 @@ const getCategoryLabel = (category) => {
 .empty-state {
   text-align: center;
   padding: 80px 20px;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 1.2rem;
+  color: #999;
+  font-size: 1.1rem;
+  font-weight: 300;
 }
 
 /* Modal */
@@ -383,7 +397,7 @@ const getCategoryLabel = (category) => {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -391,22 +405,23 @@ const getCategoryLabel = (category) => {
 }
 
 .modal-content {
-  background: #16213e;
-  border: 1px solid rgba(212, 175, 55, 0.3);
-  border-radius: 12px;
-  padding: 30px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 35px;
   max-width: 400px;
   width: 90%;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
 }
 
 .modal-content h3 {
-  color: #d4af37;
+  color: #333;
   margin-bottom: 15px;
-  font-family: 'Playfair Display', serif;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem;
 }
 
 .modal-content p {
-  color: rgba(255, 255, 255, 0.8);
+  color: #666;
   margin-bottom: 25px;
   line-height: 1.6;
 }
@@ -419,21 +434,21 @@ const getCategoryLabel = (category) => {
 
 .btn-cancel,
 .btn-confirm {
-  padding: 10px 20px;
+  padding: 12px 24px;
   border: none;
-  border-radius: 8px;
-  font-weight: 600;
+  border-radius: 25px;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .btn-cancel {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
+  background: #F5F5F5;
+  color: #666;
 }
 
 .btn-cancel:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: #EBEBEB;
 }
 
 .btn-confirm {
@@ -452,7 +467,7 @@ const getCategoryLabel = (category) => {
   }
 
   .products-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 15px;
   }
 
@@ -460,16 +475,20 @@ const getCategoryLabel = (category) => {
     height: 200px;
   }
 
+  .product-info {
+    padding: 15px;
+  }
+
   .product-name {
     font-size: 1.1rem;
   }
 
   .product-price {
-    font-size: 1.2rem;
+    font-size: 1.15rem;
   }
 
   .whatsapp-btn {
-    padding: 8px 12px;
+    padding: 8px 14px;
     font-size: 0.8rem;
   }
 }

@@ -130,26 +130,27 @@ const confirmDelete = () => {
   grid-template-columns: 180px 1fr 180px 160px 140px 100px;
   gap: 15px;
   padding: 15px 25px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid #F0F0F0;
   align-items: center;
   transition: background 0.2s;
 }
 
 .table-row:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: #FDFCFA;
 }
 
 .row-image {
   width: 170px;
   height: 170px;
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  background: #F9F9F9;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   cursor: pointer;
   position: relative;
+  border: 1px solid #ECECEC;
 }
 
 .row-image img {
@@ -159,14 +160,15 @@ const confirmDelete = () => {
 }
 
 .row-image-placeholder {
-  font-size: 1.2rem;
+  font-size: 1.5rem;
+  color: #ccc;
 }
 
 .row-image:hover::after {
   content: '🔍';
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.4);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -176,13 +178,13 @@ const confirmDelete = () => {
 
 .change-photo-btn {
   position: absolute;
-  bottom: 5px;
-  right: 5px;
+  bottom: 8px;
+  right: 8px;
   width: 32px;
   height: 32px;
   border-radius: 50%;
   border: none;
-  background: rgba(212, 175, 55, 0.9);
+  background: #B79848;
   cursor: pointer;
   font-size: 0.9rem;
   display: none;
@@ -198,14 +200,14 @@ const confirmDelete = () => {
 
 .change-photo-btn:hover {
   transform: scale(1.1);
-  background: #d4af37;
+  background: #A08640;
 }
 
 /* Lightbox */
 .lightbox-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.9);
+  background: rgba(0, 0, 0, 0.85);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -236,7 +238,7 @@ const confirmDelete = () => {
 }
 
 .lightbox-close:hover {
-  color: #d4af37;
+  color: #B79848;
 }
 
 .lightbox-image {
@@ -254,8 +256,8 @@ const confirmDelete = () => {
 }
 
 .lightbox-info h3 {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.5rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem;
   margin-bottom: 8px;
 }
 
@@ -265,39 +267,42 @@ const confirmDelete = () => {
 }
 
 .lightbox-price {
-  color: #d4af37 !important;
-  font-size: 1.2rem;
+  color: #B79848 !important;
+  font-size: 1.3rem;
   font-weight: 600;
 }
 
 .editable-field {
   background: transparent;
   border: 1px solid transparent;
-  padding: 8px 10px;
-  border-radius: 6px;
-  color: #fff;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #333;
   font-size: 0.9rem;
   width: 100%;
   transition: all 0.2s;
 }
 
 .editable-field:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
+  background: #FAFAFA;
+  border-color: #E8E8E8;
 }
 
 .editable-field:focus {
   outline: none;
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(212, 175, 55, 0.5);
+  background: #fff;
+  border-color: #B79848;
+  box-shadow: 0 0 0 3px rgba(183, 152, 72, 0.1);
 }
 
 .name-field {
   font-weight: 500;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.05rem;
 }
 
 .price-field {
-  color: #d4af37;
+  color: #B79848;
   font-weight: 600;
   text-align: right;
 }
@@ -305,33 +310,35 @@ const confirmDelete = () => {
 .sku-field {
   font-family: monospace;
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: #999;
 }
 
 .category-select {
   background: transparent;
   border: 1px solid transparent;
-  padding: 8px 10px;
-  border-radius: 6px;
-  color: #fff;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #666;
   font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .category-select:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
+  background: #FAFAFA;
+  border-color: #E8E8E8;
 }
 
 .category-select:focus {
   outline: none;
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(212, 175, 55, 0.5);
+  background: #fff;
+  border-color: #B79848;
+  box-shadow: 0 0 0 3px rgba(183, 152, 72, 0.1);
 }
 
 .category-select option {
-  background: #1a1a2e;
+  background: #fff;
+  color: #333;
 }
 
 .row-actions {
@@ -341,24 +348,23 @@ const confirmDelete = () => {
 }
 
 .delete-btn {
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: 1px solid rgba(220, 53, 69, 0.5);
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 1px solid #FED7D7;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 4px;
   transition: all 0.2s;
-  background: rgba(220, 53, 69, 0.2);
-  color: #ff6b6b;
-  font-size: 0.85rem;
+  background: #FFF5F5;
+  color: #C53030;
+  font-size: 0.8rem;
   font-weight: 500;
 }
 
 .delete-btn:hover {
-  background: rgba(220, 53, 69, 0.4);
-  border-color: #ff6b6b;
+  background: #FED7D7;
 }
 
 @media (max-width: 900px) {

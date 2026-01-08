@@ -89,7 +89,7 @@ const handleFileChange = (event) => {
 .actions-bar {
   display: flex;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
   margin-bottom: 25px;
   flex-wrap: wrap;
 }
@@ -97,67 +97,71 @@ const handleFileChange = (event) => {
 .btn {
   padding: 12px 20px;
   border: none;
-  border-radius: 8px;
-  font-size: 0.9rem;
+  border-radius: 25px;
+  font-size: 0.85rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  letter-spacing: 0.3px;
 }
 
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #fff;
+  color: #666;
+  border: 1px solid #E8E8E8;
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: #FAFAFA;
+  border-color: #B79848;
+  color: #B79848;
 }
 
 .btn-danger {
-  background: rgba(220, 53, 69, 0.2);
-  color: #ff6b6b;
-  border: 1px solid rgba(220, 53, 69, 0.3);
+  background: #FFF5F5;
+  color: #C53030;
+  border: 1px solid #FED7D7;
 }
 
 .btn-danger:hover {
-  background: rgba(220, 53, 69, 0.3);
+  background: #FED7D7;
 }
 
 .btn-ai {
-  background: linear-gradient(135deg, #10a37f 0%, #1a7f5a 100%);
+  background: #B79848;
   color: #fff;
   border: none;
 }
 
 .btn-ai:hover {
+  background: #A08640;
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(16, 163, 127, 0.4);
+  box-shadow: 0 8px 20px rgba(183, 152, 72, 0.25);
 }
 
 .btn-vision {
-  background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+  background: linear-gradient(135deg, #D4A5A5 0%, #C49A9A 100%);
   color: #fff;
   border: none;
 }
 
 .btn-vision:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(168, 85, 247, 0.4);
+  box-shadow: 0 8px 20px rgba(212, 165, 165, 0.35);
 }
 
 .btn-matcher {
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  background: linear-gradient(135deg, #9CB4A5 0%, #8AA599 100%);
   color: #fff;
   border: none;
 }
 
 .btn-matcher:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(5, 150, 105, 0.4);
+  box-shadow: 0 8px 20px rgba(156, 180, 165, 0.35);
 }
 
 @media (max-width: 600px) {

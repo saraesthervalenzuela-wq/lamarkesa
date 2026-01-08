@@ -145,38 +145,39 @@ const goToCatalog = () => {
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+  background: linear-gradient(180deg, #FFFBF7 0%, #FFF5EE 50%, #FDF8F3 100%);
 }
 
 .login-box {
   width: 100%;
   max-width: 450px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(212, 175, 55, 0.2);
-  border-radius: 20px;
-  padding: 40px;
-  backdrop-filter: blur(10px);
+  background: #fff;
+  border: 1px solid rgba(183, 152, 72, 0.15);
+  border-radius: 16px;
+  padding: 50px 40px;
+  box-shadow: 0 10px 40px rgba(183, 152, 72, 0.08);
 }
 
 .logo {
   text-align: center;
-  margin-bottom: 35px;
+  margin-bottom: 40px;
 }
 
 .logo h1 {
-  font-family: 'Playfair Display', serif;
-  font-size: 2.5rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, #d4af37 0%, #f4e4bc 50%, #d4af37 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.8rem;
+  font-weight: 600;
+  color: #B79848;
   margin-bottom: 8px;
+  letter-spacing: 2px;
 }
 
 .logo p {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.95rem;
+  color: #999;
+  font-size: 0.85rem;
+  font-weight: 300;
+  letter-spacing: 2px;
+  text-transform: uppercase;
 }
 
 .login-form {
@@ -184,42 +185,44 @@ const goToCatalog = () => {
 }
 
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 }
 
 .form-group label {
   display: block;
   margin-bottom: 8px;
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.9rem;
+  color: #666;
+  font-size: 0.85rem;
   font-weight: 500;
+  letter-spacing: 0.5px;
 }
 
 .form-group input {
   width: 100%;
   padding: 14px 18px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 10px;
-  color: #fff;
+  background: #FAFAFA;
+  border: 1px solid #E8E8E8;
+  border-radius: 8px;
+  color: #333;
   font-size: 1rem;
   transition: all 0.3s ease;
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #d4af37;
-  background: rgba(255, 255, 255, 0.12);
+  border-color: #B79848;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(183, 152, 72, 0.1);
 }
 
 .form-group input::placeholder {
-  color: rgba(255, 255, 255, 0.4);
+  color: #bbb;
 }
 
 .error-message {
-  background: rgba(220, 53, 69, 0.15);
-  border: 1px solid rgba(220, 53, 69, 0.3);
-  color: #ff6b6b;
+  background: #FFF5F5;
+  border: 1px solid #FED7D7;
+  color: #C53030;
   padding: 12px 16px;
   border-radius: 8px;
   margin-bottom: 15px;
@@ -228,20 +231,23 @@ const goToCatalog = () => {
 
 .btn-login {
   width: 100%;
-  padding: 14px;
-  background: linear-gradient(135deg, #d4af37 0%, #c9a227 100%);
+  padding: 15px;
+  background: #B79848;
   border: none;
-  border-radius: 10px;
-  color: #1a1a2e;
-  font-size: 1rem;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.95rem;
   font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .btn-login:hover:not(:disabled) {
+  background: #A08640;
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
+  box-shadow: 0 8px 25px rgba(183, 152, 72, 0.25);
 }
 
 .btn-login:disabled {
@@ -252,7 +258,7 @@ const goToCatalog = () => {
 .divider {
   text-align: center;
   position: relative;
-  margin: 25px 0;
+  margin: 30px 0;
 }
 
 .divider::before,
@@ -262,7 +268,7 @@ const goToCatalog = () => {
   top: 50%;
   width: 45%;
   height: 1px;
-  background: rgba(255, 255, 255, 0.1);
+  background: #E8E8E8;
 }
 
 .divider::before {
@@ -274,54 +280,58 @@ const goToCatalog = () => {
 }
 
 .divider span {
-  background: transparent;
+  background: #fff;
   padding: 0 15px;
-  color: rgba(255, 255, 255, 0.4);
-  font-size: 0.85rem;
+  color: #bbb;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .btn-catalog {
   width: 100%;
-  padding: 14px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  color: #fff;
-  font-size: 1rem;
+  padding: 15px;
+  background: transparent;
+  border: 1px solid #E8E8E8;
+  border-radius: 8px;
+  color: #666;
+  font-size: 0.9rem;
   font-weight: 500;
+  letter-spacing: 0.5px;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .btn-catalog:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(212, 175, 55, 0.5);
+  background: #FAFAFA;
+  border-color: #B79848;
+  color: #B79848;
 }
 
 .login-info {
-  margin-top: 30px;
+  margin-top: 35px;
   padding-top: 25px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid #F0F0F0;
 }
 
 .login-info p {
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.8rem;
+  color: #999;
+  font-size: 0.75rem;
   margin-bottom: 8px;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 .login-info strong {
-  color: #d4af37;
+  color: #B79848;
 }
 
 @media (max-width: 500px) {
   .login-box {
-    padding: 30px 25px;
+    padding: 35px 25px;
   }
 
   .logo h1 {
-    font-size: 2rem;
+    font-size: 2.2rem;
   }
 }
 </style>

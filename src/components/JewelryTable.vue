@@ -62,11 +62,12 @@ const emit = defineEmits(['add', 'update', 'delete', 'upload-image'])
 <style scoped>
 .jewelry-table {
   width: 100%;
-  background: rgba(255, 255, 255, 0.02);
+  background: #fff;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(183, 152, 72, 0.12);
   overflow: hidden;
   margin-bottom: 30px;
+  box-shadow: 0 4px 20px rgba(183, 152, 72, 0.06);
 }
 
 .table-header {
@@ -74,12 +75,12 @@ const emit = defineEmits(['add', 'update', 'delete', 'upload-image'])
   grid-template-columns: 180px 1fr 180px 160px 140px 100px;
   gap: 15px;
   padding: 18px 25px;
-  background: rgba(212, 175, 55, 0.1);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  font-size: 0.8rem;
+  background: linear-gradient(135deg, #FDFAF6 0%, #FAF7F2 100%);
+  border-bottom: 1px solid rgba(183, 152, 72, 0.12);
+  font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 1.5px;
+  color: #999;
   font-weight: 600;
 }
 
@@ -87,14 +88,14 @@ const emit = defineEmits(['add', 'update', 'delete', 'upload-image'])
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  color: rgba(255, 255, 255, 0.5);
+  color: #999;
 }
 
 .spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid rgba(212, 175, 55, 0.3);
-  border-top-color: #d4af37;
+  border: 3px solid rgba(183, 152, 72, 0.2);
+  border-top-color: #B79848;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 15px;
@@ -110,10 +111,15 @@ const emit = defineEmits(['add', 'update', 'delete', 'upload-image'])
 }
 
 .empty-state h3 {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.3rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
   margin-bottom: 8px;
-  color: rgba(255, 255, 255, 0.7);
+  color: #666;
+}
+
+.empty-state p {
+  color: #aaa;
+  font-weight: 300;
 }
 
 @media (max-width: 900px) {

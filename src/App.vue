@@ -75,7 +75,7 @@ const goToHome = () => {
 </template>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap');
 
 * {
   margin: 0;
@@ -84,10 +84,10 @@ const goToHome = () => {
 }
 
 body {
-  font-family: 'Inter', sans-serif;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+  font-family: 'Montserrat', sans-serif;
+  background: linear-gradient(180deg, #FFFBF7 0%, #FFF9F5 50%, #FDF8F3 100%);
   min-height: 100vh;
-  color: #fff;
+  color: #333;
 }
 
 #app {
@@ -96,8 +96,8 @@ body {
 
 /* Navigation */
 .navbar {
-  background: rgba(0, 0, 0, 0.3);
-  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  background: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid rgba(183, 152, 72, 0.2);
   backdrop-filter: blur(10px);
   position: sticky;
   top: 0;
@@ -119,27 +119,28 @@ body {
 }
 
 .nav-btn {
-  padding: 10px 20px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(212, 175, 55, 0.3);
-  border-radius: 8px;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.95rem;
+  padding: 10px 24px;
+  background: transparent;
+  border: 1px solid rgba(183, 152, 72, 0.4);
+  border-radius: 25px;
+  color: #666;
+  font-size: 0.9rem;
   font-weight: 500;
+  letter-spacing: 0.5px;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .nav-btn:hover {
-  background: rgba(212, 175, 55, 0.1);
-  border-color: #d4af37;
-  color: #d4af37;
+  background: rgba(183, 152, 72, 0.1);
+  border-color: #B79848;
+  color: #B79848;
 }
 
 .nav-btn.active {
-  background: rgba(212, 175, 55, 0.2);
-  border-color: #d4af37;
-  color: #d4af37;
+  background: #B79848;
+  border-color: #B79848;
+  color: #fff;
 }
 
 .nav-auth {
@@ -159,8 +160,8 @@ body {
 .spinner {
   width: 50px;
   height: 50px;
-  border: 4px solid rgba(212, 175, 55, 0.2);
-  border-top-color: #d4af37;
+  border: 3px solid rgba(183, 152, 72, 0.2);
+  border-top-color: #B79848;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 20px;
@@ -171,7 +172,9 @@ body {
 }
 
 .loading-screen p {
-  color: rgba(255, 255, 255, 0.6);
+  color: #999;
+  font-weight: 300;
+  letter-spacing: 1px;
 }
 
 /* Responsive */
@@ -189,6 +192,7 @@ body {
 
   .nav-btn {
     flex: 1;
+    text-align: center;
   }
 }
 </style>

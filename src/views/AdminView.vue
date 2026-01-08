@@ -305,30 +305,34 @@ const handleAssignPhotos = async (assignments) => {
 
 .header {
   text-align: center;
-  padding: 30px 20px;
-  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  padding: 40px 20px;
+  border-bottom: 1px solid rgba(183, 152, 72, 0.15);
   margin-bottom: 30px;
 }
 
 .header h1 {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Cormorant Garamond', serif;
   font-size: 2.5rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, #d4af37 0%, #f4e4bc 50%, #d4af37 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 8px;
+  font-weight: 600;
+  color: #B79848;
+  margin-bottom: 10px;
+  letter-spacing: 2px;
 }
 
 .header p {
-  color: rgba(255, 255, 255, 0.6);
+  color: #999;
   font-size: 0.95rem;
+  font-weight: 300;
+  letter-spacing: 0.5px;
 }
 
 @media (max-width: 600px) {
   .header h1 {
     font-size: 1.8rem;
+  }
+
+  .admin-container {
+    padding: 15px 20px;
   }
 }
 </style>

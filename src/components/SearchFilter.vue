@@ -65,47 +65,56 @@ const sortOptions = [
 
 .search-box input {
   width: 100%;
-  padding: 12px 18px 12px 45px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  color: #fff;
+  padding: 14px 18px 14px 45px;
+  background: #fff;
+  border: 1px solid #E8E8E8;
+  border-radius: 25px;
+  color: #333;
   font-size: 0.9rem;
+  transition: all 0.3s ease;
 }
 
 .search-box input::placeholder {
-  color: rgba(255, 255, 255, 0.4);
+  color: #bbb;
 }
 
 .search-box input:focus {
   outline: none;
-  border-color: rgba(212, 175, 55, 0.5);
+  border-color: #B79848;
+  box-shadow: 0 0 0 3px rgba(183, 152, 72, 0.1);
 }
 
 .search-icon {
   position: absolute;
-  left: 15px;
+  left: 18px;
   top: 50%;
   transform: translateY(-50%);
-  color: rgba(255, 255, 255, 0.4);
+  color: #bbb;
 }
 
 .filter-select {
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  color: #fff;
+  padding: 14px 20px;
+  background: #fff;
+  border: 1px solid #E8E8E8;
+  border-radius: 25px;
+  color: #666;
   font-size: 0.9rem;
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .filter-select option {
-  background: #1a1a2e;
+  background: #fff;
+  color: #333;
 }
 
 .filter-select:focus {
   outline: none;
-  border-color: rgba(212, 175, 55, 0.5);
+  border-color: #B79848;
+  box-shadow: 0 0 0 3px rgba(183, 152, 72, 0.1);
+}
+
+.filter-select:hover {
+  border-color: #B79848;
 }
 </style>

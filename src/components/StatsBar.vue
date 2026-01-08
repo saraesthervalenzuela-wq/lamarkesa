@@ -34,30 +34,34 @@ const formatCurrency = (value) => {
 .stats-bar {
   display: flex;
   justify-content: center;
-  gap: 30px;
+  gap: 20px;
   margin-bottom: 30px;
   flex-wrap: wrap;
 }
 
 .stat {
   text-align: center;
-  padding: 15px 25px;
-  background: rgba(212, 175, 55, 0.1);
+  padding: 20px 30px;
+  background: #fff;
   border-radius: 12px;
-  border: 1px solid rgba(212, 175, 55, 0.2);
+  border: 1px solid rgba(183, 152, 72, 0.15);
+  box-shadow: 0 4px 15px rgba(183, 152, 72, 0.06);
 }
 
 .stat-value {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.75rem;
-  color: #d4af37;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.8rem;
+  color: #B79848;
   font-weight: 600;
 }
 
 .stat-label {
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.5);
-  margin-top: 4px;
+  color: #999;
+  margin-top: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
 }
 
 @media (max-width: 600px) {
@@ -65,10 +69,12 @@ const formatCurrency = (value) => {
     gap: 10px;
   }
   .stat {
-    padding: 12px 18px;
+    padding: 15px 20px;
+    flex: 1;
+    min-width: 100px;
   }
   .stat-value {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
   }
 }
 </style>

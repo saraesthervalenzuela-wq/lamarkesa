@@ -85,34 +85,35 @@ const handleKeypress = (event) => {
   grid-template-columns: 180px 1fr 180px 160px 140px 100px;
   gap: 15px;
   padding: 18px 25px;
-  background: rgba(212, 175, 55, 0.05);
-  border-top: 1px dashed rgba(212, 175, 55, 0.3);
+  background: linear-gradient(135deg, #FDFAF6 0%, #FAF7F2 100%);
+  border-top: 1px dashed rgba(183, 152, 72, 0.3);
   align-items: center;
 }
 
 .add-btn {
   width: 170px;
   height: 170px;
-  border-radius: 8px;
-  border: 2px dashed rgba(212, 175, 55, 0.4);
+  border-radius: 10px;
+  border: 2px dashed rgba(183, 152, 72, 0.4);
   background: transparent;
-  color: #d4af37;
-  font-size: 1.5rem;
+  color: #B79848;
+  font-size: 2rem;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .add-btn:hover {
-  background: rgba(212, 175, 55, 0.1);
+  background: rgba(183, 152, 72, 0.08);
   border-style: solid;
+  border-color: #B79848;
 }
 
 .editable-field {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 8px 10px;
-  border-radius: 6px;
-  color: #fff;
+  background: #fff;
+  border: 1px solid #E8E8E8;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #333;
   font-size: 0.9rem;
   width: 100%;
   transition: all 0.2s;
@@ -120,16 +121,22 @@ const handleKeypress = (event) => {
 
 .editable-field:focus {
   outline: none;
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(212, 175, 55, 0.5);
+  border-color: #B79848;
+  box-shadow: 0 0 0 3px rgba(183, 152, 72, 0.1);
+}
+
+.editable-field::placeholder {
+  color: #bbb;
 }
 
 .name-field {
   font-weight: 500;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
 }
 
 .price-field {
-  color: #d4af37;
+  color: #B79848;
   font-weight: 600;
   text-align: right;
 }
@@ -137,45 +144,55 @@ const handleKeypress = (event) => {
 .sku-field {
   font-family: monospace;
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: #999;
 }
 
 .category-select {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 8px 10px;
-  border-radius: 6px;
-  color: #fff;
+  background: #fff;
+  border: 1px solid #E8E8E8;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #666;
   font-size: 0.85rem;
   cursor: pointer;
+  transition: all 0.2s;
+}
+
+.category-select:focus {
+  outline: none;
+  border-color: #B79848;
+  box-shadow: 0 0 0 3px rgba(183, 152, 72, 0.1);
 }
 
 .category-select option {
-  background: #1a1a2e;
+  background: #fff;
+  color: #333;
 }
 
 .btn {
   padding: 12px 20px;
   border: none;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
+  border-radius: 25px;
+  font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  letter-spacing: 0.5px;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #d4af37 0%, #c9a227 100%);
-  color: #1a1a2e;
+  background: #B79848;
+  color: #fff;
 }
 
 .btn-primary:hover {
+  background: #A08640;
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+  box-shadow: 0 8px 20px rgba(183, 152, 72, 0.25);
 }
 
 .btn-small {
-  padding: 6px 12px;
+  padding: 10px 18px;
   font-size: 0.8rem;
 }
 

@@ -67,8 +67,8 @@ const handleLogout = async () => {
 .spinner-small {
   width: 20px;
   height: 20px;
-  border: 2px solid rgba(212, 175, 55, 0.3);
-  border-top-color: #d4af37;
+  border: 2px solid rgba(183, 152, 72, 0.2);
+  border-top-color: #B79848;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   display: inline-block;
@@ -82,22 +82,23 @@ const handleLogout = async () => {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 6px 12px;
+  background: #fff;
+  padding: 6px 14px;
   border-radius: 25px;
-  border: 1px solid rgba(212, 175, 55, 0.2);
+  border: 1px solid rgba(183, 152, 72, 0.2);
+  box-shadow: 0 2px 8px rgba(183, 152, 72, 0.08);
 }
 
 .user-avatar {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  border: 2px solid rgba(212, 175, 55, 0.3);
+  border: 2px solid rgba(183, 152, 72, 0.3);
 }
 
 .user-name {
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.8);
+  color: #666;
   max-width: 150px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -107,7 +108,7 @@ const handleLogout = async () => {
 .btn-logout {
   background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.5);
+  color: #bbb;
   cursor: pointer;
   padding: 4px;
   display: flex;
@@ -117,17 +118,17 @@ const handleLogout = async () => {
 }
 
 .btn-logout:hover {
-  color: #ff6b6b;
+  color: #C53030;
 }
 
 .btn-login {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.95);
-  border: none;
-  border-radius: 20px;
+  padding: 10px 18px;
+  background: #fff;
+  border: 1px solid #E8E8E8;
+  border-radius: 25px;
   font-size: 0.85rem;
   font-weight: 500;
   color: #333;
@@ -136,9 +137,9 @@ const handleLogout = async () => {
 }
 
 .btn-login:hover {
-  background: #fff;
+  border-color: #B79848;
   transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 15px rgba(183, 152, 72, 0.15);
 }
 
 @media (max-width: 600px) {
