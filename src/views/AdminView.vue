@@ -29,7 +29,8 @@ const {
   uploadImage,
   clearAll,
   exportToCSV,
-  exportToJSON
+  exportToJSON,
+  exportToShopify
 } = useJewelry()
 
 onMounted(() => {
@@ -95,6 +96,15 @@ const handleExportJSON = () => {
     return
   }
   downloadFile(json, 'jewelry.json', 'application/json')
+}
+
+const handleExportShopify = () => {
+  const csv = exportToShopify()
+  if (!csv) {
+    alert('No jewelry to export')
+    return
+  }
+  downloadFile(csv, 'shopify-products.csv', 'text/csv')
 }
 
 const handleImportExcel = async (file) => {
@@ -247,6 +257,7 @@ const handleAssignPhotos = async (assignments) => {
     <ActionsBar
       @export-csv="handleExportCSV"
       @export-json="handleExportJSON"
+      @export-shopify="handleExportShopify"
       @clear-all="handleClearAll"
       @import-excel="handleImportExcel"
       @ai-import="showAIModal = true"

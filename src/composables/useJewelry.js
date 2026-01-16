@@ -193,6 +193,93 @@ export function useJewelry() {
     return JSON.stringify(data, null, 2)
   }
 
+  // Exportar a Shopify CSV format
+  const exportToShopify = () => {
+    if (jewelry.value.length === 0) return null
+
+    // Shopify required headers
+    const headers = [
+      'Handle',
+      'Title',
+      'Body (HTML)',
+      'Vendor',
+      'Product Category',
+      'Type',
+      'Tags',
+      'Published',
+      'Option1 Name',
+      'Option1 Value',
+      'Variant SKU',
+      'Variant Grams',
+      'Variant Inventory Tracker',
+      'Variant Inventory Qty',
+      'Variant Inventory Policy',
+      'Variant Fulfillment Service',
+      'Variant Price',
+      'Variant Compare At Price',
+      'Variant Requires Shipping',
+      'Variant Taxable',
+      'Image Src',
+      'Image Position',
+      'Image Alt Text',
+      'Gift Card',
+      'SEO Title',
+      'SEO Description',
+      'Status'
+    ]
+
+    const categoryToType = {
+      'rings': 'Rings',
+      'necklaces': 'Necklaces',
+      'earrings': 'Earrings',
+      'bracelets': 'Bracelets',
+      'watches': 'Watches',
+      'other': 'Jewelry'
+    }
+
+    const rows = jewelry.value.map(item => {
+      // Generate handle from name (URL-friendly)
+      const handle = (item.name || 'product')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '')
+
+      const type = categoryToType[item.category] || 'Jewelry'
+
+      return [
+        handle,                                    // Handle
+        `"${(item.name || '').replace(/"/g, '""')}"`, // Title
+        `"${(item.description || '').replace(/"/g, '""')}"`, // Body (HTML)
+        'La Markesa',                              // Vendor
+        'Apparel & Accessories > Jewelry',         // Product Category
+        type,                                      // Type
+        item.category || '',                       // Tags
+        'TRUE',                                    // Published
+        'Title',                                   // Option1 Name
+        'Default Title',                           // Option1 Value
+        item.sku || '',                            // Variant SKU
+        '0',                                       // Variant Grams
+        'shopify',                                 // Variant Inventory Tracker
+        '1',                                       // Variant Inventory Qty
+        'deny',                                    // Variant Inventory Policy
+        'manual',                                  // Variant Fulfillment Service
+        item.price || 0,                           // Variant Price
+        '',                                        // Variant Compare At Price
+        'TRUE',                                    // Variant Requires Shipping
+        'TRUE',                                    // Variant Taxable
+        item.image || '',                          // Image Src
+        '1',                                       // Image Position
+        `"${(item.name || '').replace(/"/g, '""')}"`, // Image Alt Text
+        'FALSE',                                   // Gift Card
+        `"${(item.name || '').replace(/"/g, '""')}"`, // SEO Title
+        `"${(item.description || item.name || '').replace(/"/g, '""')}"`, // SEO Description
+        'active'                                   // Status
+      ]
+    })
+
+    return [headers.join(','), ...rows.map(r => r.join(','))].join('\n')
+  }
+
   return {
     jewelry,
     loading,
@@ -208,6 +295,7 @@ export function useJewelry() {
     uploadImage,
     clearAll,
     exportToCSV,
-    exportToJSON
+    exportToJSON,
+    exportToShopify
   }
 }
