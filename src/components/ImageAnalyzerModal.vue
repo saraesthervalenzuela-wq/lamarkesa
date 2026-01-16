@@ -301,36 +301,15 @@ Categories: rings|necklaces|earrings|bracelets|watches|other`
         img.analyzed = true
         img.result = parsed
 
-        // Add each detected item with cropped image
+        // Add each detected item - use FULL image (no cropping)
         for (let j = 0; j < parsed.length; j++) {
           const item = parsed[j]
-          statusText.value = `Image ${i + 1}: Cropping item ${j + 1} of ${parsed.length}...`
+          statusText.value = `Image ${i + 1}: Processing item ${j + 1} of ${parsed.length}...`
 
-          // Crop image if bbox is provided, otherwise use full image
-          let croppedImage = img.preview
-
-          // Check if bbox exists and has valid values
-          if (item.bbox &&
-              typeof item.bbox.x === 'number' &&
-              typeof item.bbox.y === 'number' &&
-              typeof item.bbox.width === 'number' &&
-              typeof item.bbox.height === 'number' &&
-              item.bbox.width > 0 &&
-              item.bbox.height > 0) {
-            console.log(`Cropping item ${j + 1}:`, item.name, 'bbox:', item.bbox)
-            try {
-              croppedImage = await cropImage(img.preview, item.bbox)
-              console.log(`Crop successful for item ${j + 1}`)
-            } catch (e) {
-              console.error('Crop failed:', e)
-            }
-          } else {
-            console.log(`No valid bbox for item ${j + 1}:`, item.name, 'bbox:', item.bbox)
-          }
-
+          // Always use full image without cropping
           analyzedItems.value.push({
             imageId: img.id,
-            imagePreview: croppedImage,
+            imagePreview: img.preview,
             name: item.name || 'Unnamed Jewelry',
             sku: item.sku || '',
             category: item.category || 'other',
