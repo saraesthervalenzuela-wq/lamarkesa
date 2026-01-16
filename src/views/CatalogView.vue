@@ -358,8 +358,9 @@ const getCategoryLabel = (category) => {
 .product-image img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   transition: transform 0.4s ease;
+  background: #F9F9F9;
 }
 
 .product-card:hover .product-image img {
@@ -481,7 +482,8 @@ const getCategoryLabel = (category) => {
 .list-image img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  background: #F9F9F9;
 }
 
 .no-image-list {
