@@ -6,7 +6,7 @@ const { userSettings, saveApiKey } = useAuth()
 
 const emit = defineEmits(['close', 'import'])
 
-// Usar API key de Firestore (userSettings) con fallback a localStorage
+// Use API key from Firestore (userSettings) with localStorage fallback
 const apiKey = ref('')
 const images = ref([])
 const isLoading = ref(false)
@@ -15,9 +15,9 @@ const analyzedItems = ref([])
 const lightboxImage = ref(null)
 const savingApiKey = ref(false)
 
-// Cargar API key al montar
+// Load API key on mount
 onMounted(() => {
-  // Prioridad: Firestore > localStorage
+  // Priority: Firestore > localStorage
   if (userSettings.value?.openaiApiKey) {
     apiKey.value = userSettings.value.openaiApiKey
   } else {
@@ -28,7 +28,7 @@ onMounted(() => {
 const hasResults = computed(() => analyzedItems.value.length > 0)
 const hasImages = computed(() => images.value.length > 0)
 
-// Guardar API key en Firestore
+// Save API key to Firestore
 const handleSaveApiKey = async () => {
   if (!apiKey.value.trim()) return
 
@@ -36,15 +36,15 @@ const handleSaveApiKey = async () => {
   try {
     await saveApiKey(apiKey.value)
     localStorage.setItem('openaiApiKey', apiKey.value)
-    statusText.value = 'API Key guardada correctamente'
+    statusText.value = 'API Key saved successfully'
     setTimeout(() => {
-      if (statusText.value === 'API Key guardada correctamente') {
+      if (statusText.value === 'API Key saved successfully') {
         statusText.value = ''
       }
     }, 2000)
   } catch (error) {
     console.error('Error saving API key:', error)
-    statusText.value = 'Error al guardar API Key'
+    statusText.value = 'Error saving API Key'
   } finally {
     savingApiKey.value = false
   }
@@ -418,7 +418,7 @@ const categories = [
         <div class="form-group">
           <label>
             OpenAI API Key
-            (<a href="https://platform.openai.com/api-keys" target="_blank">obtén una aquí</a>)
+            (<a href="https://platform.openai.com/api-keys" target="_blank">get one here</a>)
           </label>
           <div class="api-key-row">
             <input
@@ -431,20 +431,20 @@ const categories = [
               class="btn-save-key"
               @click="handleSaveApiKey"
               :disabled="savingApiKey || !apiKey.trim()"
-              :title="userSettings?.openaiApiKey ? 'API Key guardada - Click para actualizar' : 'Guardar API Key'"
+              :title="userSettings?.openaiApiKey ? 'API Key saved - Click to update' : 'Save API Key'"
             >
               <span v-if="savingApiKey" class="spinner-small"></span>
-              <span v-else>{{ userSettings?.openaiApiKey ? '✓ Guardada' : '💾 Guardar' }}</span>
+              <span v-else>{{ userSettings?.openaiApiKey ? '✓ Saved' : '💾 Save' }}</span>
             </button>
           </div>
           <small v-if="userSettings?.openaiApiKey" class="api-saved-hint">
-            Tu API key está guardada en tu cuenta
+            Your API key is saved to your account
           </small>
         </div>
 
         <!-- Image Upload -->
         <div class="form-group">
-          <label>Sube imágenes (sin límite)</label>
+          <label>Upload Images (unlimited)</label>
           <div
             class="file-upload"
             :class="{ 'dragging': isDragging }"
@@ -462,8 +462,8 @@ const categories = [
               class="hidden"
             >
             <div class="upload-icon">{{ isDragging ? '📥' : '📸' }}</div>
-            <p>{{ isDragging ? '¡Suelta las imágenes aquí!' : 'Click o arrastra para subir imágenes' }}</p>
-            <small>JPG, PNG, HEIC - sin límite de cantidad</small>
+            <p>{{ isDragging ? 'Drop images here!' : 'Click or drag to upload images' }}</p>
+            <small>JPG, PNG, HEIC - no limit</small>
           </div>
         </div>
 
@@ -1197,6 +1197,15 @@ const categories = [
 
   .modal-body {
     padding: 20px;
+  }
+
+  .api-key-row {
+    flex-direction: column;
+  }
+
+  .btn-save-key {
+    width: 100%;
+    justify-content: center;
   }
 
   .images-grid {
