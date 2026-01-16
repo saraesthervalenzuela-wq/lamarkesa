@@ -11,12 +11,31 @@ const isLoading = ref(false)
 const statusText = ref('')
 const analyzedItems = ref([])
 const lightboxImage = ref(null)
+const uploadedHashes = ref(new Set()) // Track uploaded images to prevent duplicates
 
 // Get API key from userSettings (managed in Settings modal)
 const apiKey = computed(() => userSettings.value?.openaiApiKey || '')
 
 const hasResults = computed(() => analyzedItems.value.length > 0)
 const hasImages = computed(() => images.value.length > 0)
+
+// Generate simple hash from image data for duplicate detection
+const generateImageHash = async (file) => {
+  return new Promise((resolve) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const data = e.target.result
+      // Simple hash: use file size + first/last bytes
+      let hash = file.size.toString()
+      if (data.length > 100) {
+        hash += data.substring(50, 100) + data.substring(data.length - 50)
+      }
+      resolve(hash)
+    }
+    reader.onerror = () => resolve(file.name + file.size)
+    reader.readAsDataURL(file)
+  })
+}
 
 // Convert image file to JPEG using canvas
 const convertToJpeg = (file) => {
@@ -54,6 +73,7 @@ const isDragging = ref(false)
 // Process files (shared between upload and drag/drop)
 const processFiles = async (files) => {
   const fileList = Array.from(files)
+  let duplicatesSkipped = 0
 
   for (const file of fileList) {
     // Accept image files
@@ -62,10 +82,21 @@ const processFiles = async (files) => {
     }
 
     try {
+      // Check for duplicates
+      statusText.value = `Checking ${file.name}...`
+      const hash = await generateImageHash(file)
+
+      if (uploadedHashes.value.has(hash)) {
+        duplicatesSkipped++
+        console.log(`Skipping duplicate: ${file.name}`)
+        continue
+      }
+
       // Convert to JPEG for better compatibility
       statusText.value = `Processing ${file.name}...`
       const jpegFile = await convertToJpeg(file)
 
+      uploadedHashes.value.add(hash)
       const reader = new FileReader()
       reader.onload = (e) => {
         images.value.push({
@@ -73,6 +104,7 @@ const processFiles = async (files) => {
           file: jpegFile,
           name: file.name,
           preview: e.target.result,
+          hash: hash,
           analyzed: false,
           result: null
         })
@@ -83,7 +115,11 @@ const processFiles = async (files) => {
     }
   }
 
-  statusText.value = ''
+  if (duplicatesSkipped > 0) {
+    statusText.value = `Done! Skipped ${duplicatesSkipped} duplicate${duplicatesSkipped > 1 ? 's' : ''}`
+  } else {
+    statusText.value = ''
+  }
 }
 
 // Handle file upload with conversion
@@ -125,6 +161,10 @@ const closeLightbox = () => {
 
 // Remove image
 const removeImage = (id) => {
+  const image = images.value.find(img => img.id === id)
+  if (image?.hash) {
+    uploadedHashes.value.delete(image.hash)
+  }
   images.value = images.value.filter(img => img.id !== id)
   analyzedItems.value = analyzedItems.value.filter(item => item.imageId !== id)
 }
@@ -419,7 +459,7 @@ const categories = [
         <div v-if="hasImages" class="images-preview">
           <div class="images-header">
             <label>Selected images ({{ images.length }})</label>
-            <button class="btn-clear-all" @click="images = []; analyzedItems = []">
+            <button class="btn-clear-all" @click="images = []; analyzedItems = []; uploadedHashes.clear()">
               🗑️ Clear All
             </button>
           </div>

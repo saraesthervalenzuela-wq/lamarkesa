@@ -19,6 +19,7 @@ const statusText = ref('')
 const matches = ref([])
 const lightboxImage = ref(null)
 const isDragging = ref(false)
+const uploadedHashes = ref(new Set()) // Track uploaded images to prevent duplicates
 
 // Get API key from userSettings (managed in Settings modal)
 const apiKey = computed(() => userSettings.value?.openaiApiKey || '')
@@ -30,6 +31,24 @@ const productsWithoutPhotos = computed(() => {
 
 const hasPhotos = computed(() => photos.value.length > 0)
 const hasMatches = computed(() => matches.value.length > 0)
+
+// Generate simple hash from image data for duplicate detection
+const generateImageHash = async (file) => {
+  return new Promise((resolve) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const data = e.target.result
+      // Simple hash: use file size + first/last bytes + name length
+      let hash = file.size.toString()
+      if (data.length > 100) {
+        hash += data.substring(50, 100) + data.substring(data.length - 50)
+      }
+      resolve(hash)
+    }
+    reader.onerror = () => resolve(file.name + file.size)
+    reader.readAsDataURL(file)
+  })
+}
 
 // Convert image to JPEG using canvas
 const convertToJpeg = (file) => {
@@ -79,6 +98,7 @@ const convertToJpeg = (file) => {
 // Process files (shared between upload and drag/drop)
 const processFiles = async (files) => {
   const fileList = Array.from(files)
+  let duplicatesSkipped = 0
 
   for (const file of fileList) {
     if (!file.type.startsWith('image/') && !file.name.match(/\.(heic|heif|jpg|jpeg|png|gif|webp)$/i)) {
@@ -86,14 +106,26 @@ const processFiles = async (files) => {
     }
 
     try {
+      // Check for duplicates
+      statusText.value = `Checking ${file.name}...`
+      const hash = await generateImageHash(file)
+
+      if (uploadedHashes.value.has(hash)) {
+        duplicatesSkipped++
+        console.log(`Skipping duplicate: ${file.name}`)
+        continue
+      }
+
       statusText.value = `Processing ${file.name}...`
       const { file: jpegFile, dataUrl } = await convertToJpeg(file)
 
+      uploadedHashes.value.add(hash)
       photos.value.push({
         id: Date.now() + Math.random(),
         file: jpegFile,
         name: file.name,
         preview: dataUrl,
+        hash: hash,
         matchedProduct: null,
         confidence: null
       })
@@ -102,7 +134,11 @@ const processFiles = async (files) => {
     }
   }
 
-  statusText.value = ''
+  if (duplicatesSkipped > 0) {
+    statusText.value = `Done! Skipped ${duplicatesSkipped} duplicate${duplicatesSkipped > 1 ? 's' : ''}`
+  } else {
+    statusText.value = ''
+  }
 }
 
 // Handle file upload
@@ -134,6 +170,10 @@ const handleDrop = async (event) => {
 
 // Remove photo
 const removePhoto = (id) => {
+  const photo = photos.value.find(p => p.id === id)
+  if (photo?.hash) {
+    uploadedHashes.value.delete(photo.hash)
+  }
   photos.value = photos.value.filter(p => p.id !== id)
   matches.value = matches.value.filter(m => m.photoId !== id)
 }
@@ -152,6 +192,7 @@ const closeLightbox = () => {
 const clearAll = () => {
   photos.value = []
   matches.value = []
+  uploadedHashes.value.clear()
 }
 
 // AI Match photos to products
