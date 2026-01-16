@@ -95,49 +95,52 @@ const convertToJpeg = (file) => {
   })
 }
 
-// Process files (shared between upload and drag/drop)
+// Process files (only 1 photo at a time to avoid confusion)
 const processFiles = async (files) => {
   const fileList = Array.from(files)
-  let duplicatesSkipped = 0
 
-  for (const file of fileList) {
-    if (!file.type.startsWith('image/') && !file.name.match(/\.(heic|heif|jpg|jpeg|png|gif|webp)$/i)) {
-      continue
-    }
+  // Only take the first file
+  const file = fileList.find(f =>
+    f.type.startsWith('image/') || f.name.match(/\.(heic|heif|jpg|jpeg|png|gif|webp)$/i)
+  )
 
-    try {
-      // Check for duplicates
-      statusText.value = `Checking ${file.name}...`
-      const hash = await generateImageHash(file)
-
-      if (uploadedHashes.value.has(hash)) {
-        duplicatesSkipped++
-        console.log(`Skipping duplicate: ${file.name}`)
-        continue
-      }
-
-      statusText.value = `Processing ${file.name}...`
-      const { file: jpegFile, dataUrl } = await convertToJpeg(file)
-
-      uploadedHashes.value.add(hash)
-      photos.value.push({
-        id: Date.now() + Math.random(),
-        file: jpegFile,
-        name: file.name,
-        preview: dataUrl,
-        hash: hash,
-        matchedProduct: null,
-        confidence: null
-      })
-    } catch (error) {
-      console.error('Error processing', file.name, error)
-    }
+  if (!file) {
+    statusText.value = 'No valid image found'
+    return
   }
 
-  if (duplicatesSkipped > 0) {
-    statusText.value = `Done! Skipped ${duplicatesSkipped} duplicate${duplicatesSkipped > 1 ? 's' : ''}`
-  } else {
+  try {
+    // Check for duplicates
+    statusText.value = `Checking ${file.name}...`
+    const hash = await generateImageHash(file)
+
+    if (uploadedHashes.value.has(hash)) {
+      statusText.value = `Photo already uploaded (duplicate)`
+      return
+    }
+
+    statusText.value = `Processing ${file.name}...`
+    const { file: jpegFile, dataUrl } = await convertToJpeg(file)
+
+    // Clear previous photo and matches before adding new one
+    photos.value = []
+    matches.value = []
+
+    uploadedHashes.value.add(hash)
+    photos.value.push({
+      id: Date.now() + Math.random(),
+      file: jpegFile,
+      name: file.name,
+      preview: dataUrl,
+      hash: hash,
+      matchedProduct: null,
+      confidence: null
+    })
+
     statusText.value = ''
+  } catch (error) {
+    console.error('Error processing', file.name, error)
+    statusText.value = `Error: ${error.message}`
   }
 }
 
@@ -387,9 +390,9 @@ const getConfidenceColor = (confidence) => {
           </span>
         </div>
 
-        <!-- Photo Upload with Drag & Drop -->
+        <!-- Photo Upload with Drag & Drop (1 photo at a time) -->
         <div class="form-group">
-          <label>Upload Photos to Match (unlimited)</label>
+          <label>Upload 1 Photo at a Time</label>
           <div
             class="file-upload"
             :class="{ 'dragging': isDragging }"
@@ -402,13 +405,12 @@ const getConfidenceColor = (confidence) => {
               ref="fileInput"
               type="file"
               accept="image/*"
-              multiple
               @change="handleFileUpload"
               class="hidden"
             >
             <div class="upload-icon">{{ isDragging ? '📥' : '📷' }}</div>
-            <p>{{ isDragging ? 'Drop photos here!' : 'Click or drag to upload photos' }}</p>
-            <small>Drag as many photos as you want - no limit</small>
+            <p>{{ isDragging ? 'Drop photo here!' : 'Click or drag to upload 1 photo' }}</p>
+            <small>One photo at a time to avoid confusion with similar items</small>
           </div>
         </div>
 
@@ -513,7 +515,7 @@ const getConfidenceColor = (confidence) => {
           :disabled="isLoading || !hasPhotos || productsWithoutPhotos.length === 0"
         >
           <span v-if="isLoading" class="spinner-small"></span>
-          🔍 Match {{ photos.length }} Photo{{ photos.length !== 1 ? 's' : '' }}
+          🔍 Match Photo
         </button>
         <button
           v-if="hasMatches"
