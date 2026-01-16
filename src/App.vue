@@ -1,8 +1,10 @@
 <script setup>
 import { useRouter, useRoute } from 'vue-router'
+import { useAuth } from './composables/useAuth'
 
 const router = useRouter()
 const route = useRoute()
+const { user, isAdmin, isEditor, logout } = useAuth()
 
 const goToCatalog = () => {
   router.push('/catalog')
@@ -14,6 +16,15 @@ const goToEdit = () => {
 
 const goToAdmin = () => {
   router.push('/admin')
+}
+
+const goToLogin = () => {
+  router.push('/login')
+}
+
+const handleLogout = async () => {
+  await logout()
+  router.push('/catalog')
 }
 </script>
 
@@ -27,6 +38,7 @@ const goToAdmin = () => {
         </div>
 
         <div class="nav-links">
+          <!-- Catálogo: visible para todos -->
           <button
             @click="goToCatalog"
             :class="{ active: route.path === '/catalog' || route.path === '/' }"
@@ -34,19 +46,42 @@ const goToAdmin = () => {
           >
             Catálogo
           </button>
+
+          <!-- Editar: solo para editor y admin -->
           <button
+            v-if="isEditor"
             @click="goToEdit"
             :class="{ active: route.path === '/edit' }"
             class="nav-btn"
           >
             Editar
           </button>
+
+          <!-- Admin: solo para admin -->
           <button
+            v-if="isAdmin"
             @click="goToAdmin"
             :class="{ active: route.path === '/admin' }"
             class="nav-btn nav-btn-admin"
           >
             Admin
+          </button>
+
+          <!-- Login/Logout -->
+          <button
+            v-if="!user"
+            @click="goToLogin"
+            class="nav-btn nav-btn-login"
+          >
+            Iniciar sesión
+          </button>
+          <button
+            v-else
+            @click="handleLogout"
+            class="nav-btn nav-btn-logout"
+            :title="user.email"
+          >
+            Salir
           </button>
         </div>
       </div>
@@ -116,6 +151,7 @@ body {
 .nav-links {
   display: flex;
   gap: 12px;
+  align-items: center;
 }
 
 .nav-btn {
@@ -147,6 +183,30 @@ body {
   border-color: rgba(183, 152, 72, 0.6);
 }
 
+.nav-btn-login {
+  background: rgba(183, 152, 72, 0.1);
+  border-color: #B79848;
+  color: #B79848;
+}
+
+.nav-btn-login:hover {
+  background: #B79848;
+  color: #fff;
+}
+
+.nav-btn-logout {
+  background: transparent;
+  border-color: #999;
+  color: #999;
+  font-size: 0.85rem;
+  padding: 8px 16px;
+}
+
+.nav-btn-logout:hover {
+  border-color: #666;
+  color: #666;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .nav-content {
@@ -158,6 +218,7 @@ body {
   .nav-links {
     width: 100%;
     justify-content: center;
+    flex-wrap: wrap;
   }
 
   .nav-btn {
@@ -165,6 +226,7 @@ body {
     text-align: center;
     padding: 10px 16px;
     font-size: 0.85rem;
+    min-width: auto;
   }
 
   .brand-text {
