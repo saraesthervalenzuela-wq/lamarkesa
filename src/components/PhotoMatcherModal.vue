@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useAuth } from '../composables/useAuth'
 
 const { userSettings } = useAuth()
@@ -19,7 +19,41 @@ const statusText = ref('')
 const matches = ref([])
 const lightboxImage = ref(null)
 const isDragging = ref(false)
-const uploadedHashes = ref(new Set()) // Track uploaded images to prevent duplicates
+const uploadedHashes = ref(new Set()) // Track uploaded images in current session
+
+// Persistent memory: hashes of photos that were successfully assigned to products
+const STORAGE_KEY = 'photoMatcher_assignedHashes'
+
+const loadAssignedHashes = () => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY)
+    return saved ? new Set(JSON.parse(saved)) : new Set()
+  } catch {
+    return new Set()
+  }
+}
+
+const saveAssignedHash = (hash) => {
+  try {
+    const assigned = loadAssignedHashes()
+    assigned.add(hash)
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([...assigned]))
+  } catch (e) {
+    console.error('Error saving hash:', e)
+  }
+}
+
+const isAlreadyAssigned = (hash) => {
+  const assigned = loadAssignedHashes()
+  return assigned.has(hash)
+}
+
+const clearAssignedHashes = () => {
+  localStorage.removeItem(STORAGE_KEY)
+}
+
+// Count of assigned photos for display
+const assignedCount = computed(() => loadAssignedHashes().size)
 
 // Get API key from userSettings (managed in Settings modal)
 const apiKey = computed(() => userSettings.value?.openaiApiKey || '')
@@ -110,12 +144,18 @@ const processFiles = async (files) => {
   }
 
   try {
-    // Check for duplicates
+    // Check for duplicates in current session
     statusText.value = `Checking ${file.name}...`
     const hash = await generateImageHash(file)
 
     if (uploadedHashes.value.has(hash)) {
-      statusText.value = `Photo already uploaded (duplicate)`
+      statusText.value = `Photo already uploaded in this session`
+      return
+    }
+
+    // Check if photo was already assigned to a product before
+    if (isAlreadyAssigned(hash)) {
+      statusText.value = `✓ Photo "${file.name}" was already assigned to a product - skipping`
       return
     }
 
@@ -347,6 +387,14 @@ const applyMatches = () => {
     return
   }
 
+  // Save hashes of photos being assigned (for memory/persistence)
+  for (const match of approvedMatches) {
+    const photo = photos.value.find(p => p.id === match.photoId)
+    if (photo?.hash) {
+      saveAssignedHash(photo.hash)
+    }
+  }
+
   const assignments = approvedMatches.map(m => ({
     productId: m.productId,
     photoDataUrl: m.photoPreview
@@ -388,6 +436,14 @@ const getConfidenceColor = (confidence) => {
           <span v-else class="api-status missing">
             ⚠️ No API Key - Configure in Settings (⚙️ button)
           </span>
+        </div>
+
+        <!-- Memory Status: shows how many photos have been processed -->
+        <div v-if="assignedCount > 0" class="memory-status">
+          <span>🧠 Memory: <strong>{{ assignedCount }}</strong> photos already assigned (will be skipped)</span>
+          <button class="btn-clear-memory" @click="clearAssignedHashes" title="Clear memory to reprocess all photos">
+            Clear Memory
+          </button>
         </div>
 
         <!-- Photo Upload with Drag & Drop (1 photo at a time) -->
@@ -628,6 +684,41 @@ const getConfidenceColor = (confidence) => {
 
 .api-status.missing {
   color: #ff6b6b;
+}
+
+.memory-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  background: rgba(147, 51, 234, 0.15);
+  border: 1px solid rgba(147, 51, 234, 0.3);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+}
+
+.memory-status strong {
+  color: #a78bfa;
+}
+
+.btn-clear-memory {
+  background: rgba(147, 51, 234, 0.3);
+  border: 1px solid rgba(147, 51, 234, 0.5);
+  color: #a78bfa;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.btn-clear-memory:hover {
+  background: rgba(147, 51, 234, 0.5);
+  color: #fff;
 }
 
 .modal-footer {
