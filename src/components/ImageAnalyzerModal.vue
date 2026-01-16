@@ -1,17 +1,54 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useAuth } from '../composables/useAuth'
+
+const { userSettings, saveApiKey } = useAuth()
 
 const emit = defineEmits(['close', 'import'])
 
-const apiKey = ref(localStorage.getItem('openaiApiKey') || '')
+// Usar API key de Firestore (userSettings) con fallback a localStorage
+const apiKey = ref('')
 const images = ref([])
 const isLoading = ref(false)
 const statusText = ref('')
 const analyzedItems = ref([])
 const lightboxImage = ref(null)
+const savingApiKey = ref(false)
+
+// Cargar API key al montar
+onMounted(() => {
+  // Prioridad: Firestore > localStorage
+  if (userSettings.value?.openaiApiKey) {
+    apiKey.value = userSettings.value.openaiApiKey
+  } else {
+    apiKey.value = localStorage.getItem('openaiApiKey') || ''
+  }
+})
 
 const hasResults = computed(() => analyzedItems.value.length > 0)
 const hasImages = computed(() => images.value.length > 0)
+
+// Guardar API key en Firestore
+const handleSaveApiKey = async () => {
+  if (!apiKey.value.trim()) return
+
+  savingApiKey.value = true
+  try {
+    await saveApiKey(apiKey.value)
+    localStorage.setItem('openaiApiKey', apiKey.value)
+    statusText.value = 'API Key guardada correctamente'
+    setTimeout(() => {
+      if (statusText.value === 'API Key guardada correctamente') {
+        statusText.value = ''
+      }
+    }, 2000)
+  } catch (error) {
+    console.error('Error saving API key:', error)
+    statusText.value = 'Error al guardar API Key'
+  } finally {
+    savingApiKey.value = false
+  }
+}
 
 // Convert image file to JPEG using canvas
 const convertToJpeg = (file) => {
@@ -381,19 +418,33 @@ const categories = [
         <div class="form-group">
           <label>
             OpenAI API Key
-            (<a href="https://platform.openai.com/api-keys" target="_blank">get one here</a>)
+            (<a href="https://platform.openai.com/api-keys" target="_blank">obtén una aquí</a>)
           </label>
-          <input
-            type="password"
-            v-model="apiKey"
-            placeholder="sk-..."
-            class="input-field mono"
-          >
+          <div class="api-key-row">
+            <input
+              type="password"
+              v-model="apiKey"
+              placeholder="sk-..."
+              class="input-field mono"
+            >
+            <button
+              class="btn-save-key"
+              @click="handleSaveApiKey"
+              :disabled="savingApiKey || !apiKey.trim()"
+              :title="userSettings?.openaiApiKey ? 'API Key guardada - Click para actualizar' : 'Guardar API Key'"
+            >
+              <span v-if="savingApiKey" class="spinner-small"></span>
+              <span v-else>{{ userSettings?.openaiApiKey ? '✓ Guardada' : '💾 Guardar' }}</span>
+            </button>
+          </div>
+          <small v-if="userSettings?.openaiApiKey" class="api-saved-hint">
+            Tu API key está guardada en tu cuenta
+          </small>
         </div>
 
         <!-- Image Upload -->
         <div class="form-group">
-          <label>Upload Images (bulk upload supported)</label>
+          <label>Sube imágenes (sin límite)</label>
           <div
             class="file-upload"
             :class="{ 'dragging': isDragging }"
@@ -411,8 +462,8 @@ const categories = [
               class="hidden"
             >
             <div class="upload-icon">{{ isDragging ? '📥' : '📸' }}</div>
-            <p>{{ isDragging ? 'Drop images here!' : 'Click or drag to upload multiple images' }}</p>
-            <small>JPG, PNG, HEIC - auto-converted to JPG</small>
+            <p>{{ isDragging ? '¡Suelta las imágenes aquí!' : 'Click o arrastra para subir imágenes' }}</p>
+            <small>JPG, PNG, HEIC - sin límite de cantidad</small>
           </div>
         </div>
 
@@ -624,6 +675,48 @@ const categories = [
 
 .form-group a {
   color: #a855f7;
+}
+
+.api-key-row {
+  display: flex;
+  gap: 12px;
+}
+
+.api-key-row .input-field {
+  flex: 1;
+}
+
+.btn-save-key {
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+}
+
+.btn-save-key:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
+}
+
+.btn-save-key:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.api-saved-hint {
+  display: block;
+  margin-top: 6px;
+  color: #a855f7;
+  font-size: 0.8rem;
 }
 
 .input-field {

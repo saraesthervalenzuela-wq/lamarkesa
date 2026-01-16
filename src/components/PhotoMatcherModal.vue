@@ -1,5 +1,8 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useAuth } from '../composables/useAuth'
+
+const { userSettings, saveApiKey } = useAuth()
 
 const props = defineProps({
   products: {
@@ -10,12 +13,25 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'assign-photos'])
 
-const apiKey = ref(localStorage.getItem('openaiApiKey') || '')
+// Usar API key de Firestore (userSettings) con fallback a localStorage
+const apiKey = ref('')
 const photos = ref([])
 const isLoading = ref(false)
 const statusText = ref('')
 const matches = ref([])
 const lightboxImage = ref(null)
+const isDragging = ref(false)
+const savingApiKey = ref(false)
+
+// Cargar API key al montar
+onMounted(() => {
+  // Prioridad: Firestore > localStorage
+  if (userSettings.value?.openaiApiKey) {
+    apiKey.value = userSettings.value.openaiApiKey
+  } else {
+    apiKey.value = localStorage.getItem('openaiApiKey') || ''
+  }
+})
 
 // Products without images
 const productsWithoutPhotos = computed(() => {
@@ -24,6 +40,28 @@ const productsWithoutPhotos = computed(() => {
 
 const hasPhotos = computed(() => photos.value.length > 0)
 const hasMatches = computed(() => matches.value.length > 0)
+
+// Guardar API key en Firestore
+const handleSaveApiKey = async () => {
+  if (!apiKey.value.trim()) return
+
+  savingApiKey.value = true
+  try {
+    await saveApiKey(apiKey.value)
+    localStorage.setItem('openaiApiKey', apiKey.value)
+    statusText.value = 'API Key guardada correctamente'
+    setTimeout(() => {
+      if (statusText.value === 'API Key guardada correctamente') {
+        statusText.value = ''
+      }
+    }, 2000)
+  } catch (error) {
+    console.error('Error saving API key:', error)
+    statusText.value = 'Error al guardar API Key'
+  } finally {
+    savingApiKey.value = false
+  }
+}
 
 // Convert image to JPEG using canvas
 const convertToJpeg = (file) => {
@@ -70,17 +108,17 @@ const convertToJpeg = (file) => {
   })
 }
 
-// Handle file upload
-const handleFileUpload = async (event) => {
-  const files = Array.from(event.target.files)
+// Process files (shared between upload and drag/drop)
+const processFiles = async (files) => {
+  const fileList = Array.from(files)
 
-  for (const file of files) {
+  for (const file of fileList) {
     if (!file.type.startsWith('image/') && !file.name.match(/\.(heic|heif|jpg|jpeg|png|gif|webp)$/i)) {
       continue
     }
 
     try {
-      statusText.value = `Processing ${file.name}...`
+      statusText.value = `Procesando ${file.name}...`
       const { file: jpegFile, dataUrl } = await convertToJpeg(file)
 
       photos.value.push({
@@ -97,7 +135,33 @@ const handleFileUpload = async (event) => {
   }
 
   statusText.value = ''
+}
+
+// Handle file upload
+const handleFileUpload = async (event) => {
+  await processFiles(event.target.files)
   event.target.value = ''
+}
+
+// Drag and drop handlers
+const handleDragOver = (event) => {
+  event.preventDefault()
+  isDragging.value = true
+}
+
+const handleDragLeave = (event) => {
+  event.preventDefault()
+  isDragging.value = false
+}
+
+const handleDrop = async (event) => {
+  event.preventDefault()
+  isDragging.value = false
+
+  const files = event.dataTransfer.files
+  if (files.length > 0) {
+    await processFiles(files)
+  }
 }
 
 // Remove photo
@@ -310,20 +374,41 @@ const getConfidenceColor = (confidence) => {
         <div class="form-group">
           <label>
             OpenAI API Key
-            (<a href="https://platform.openai.com/api-keys" target="_blank">get one here</a>)
+            (<a href="https://platform.openai.com/api-keys" target="_blank">obtén una aquí</a>)
           </label>
-          <input
-            type="password"
-            v-model="apiKey"
-            placeholder="sk-..."
-            class="input-field mono"
-          >
+          <div class="api-key-row">
+            <input
+              type="password"
+              v-model="apiKey"
+              placeholder="sk-..."
+              class="input-field mono"
+            >
+            <button
+              class="btn-save-key"
+              @click="handleSaveApiKey"
+              :disabled="savingApiKey || !apiKey.trim()"
+              :title="userSettings?.openaiApiKey ? 'API Key guardada - Click para actualizar' : 'Guardar API Key'"
+            >
+              <span v-if="savingApiKey" class="spinner-small"></span>
+              <span v-else>{{ userSettings?.openaiApiKey ? '✓ Guardada' : '💾 Guardar' }}</span>
+            </button>
+          </div>
+          <small v-if="userSettings?.openaiApiKey" class="api-saved-hint">
+            Tu API key está guardada en tu cuenta
+          </small>
         </div>
 
-        <!-- Photo Upload -->
+        <!-- Photo Upload with Drag & Drop -->
         <div class="form-group">
-          <label>Upload Photos to Match</label>
-          <div class="file-upload" @click="$refs.fileInput.click()">
+          <label>Sube fotos para emparejar (sin límite)</label>
+          <div
+            class="file-upload"
+            :class="{ 'dragging': isDragging }"
+            @click="$refs.fileInput.click()"
+            @dragover="handleDragOver"
+            @dragleave="handleDragLeave"
+            @drop="handleDrop"
+          >
             <input
               ref="fileInput"
               type="file"
@@ -332,9 +417,9 @@ const getConfidenceColor = (confidence) => {
               @change="handleFileUpload"
               class="hidden"
             >
-            <div class="upload-icon">📷</div>
-            <p>Click to upload multiple photos</p>
-            <small>AI will match each photo to a product</small>
+            <div class="upload-icon">{{ isDragging ? '📥' : '📷' }}</div>
+            <p>{{ isDragging ? '¡Suelta las fotos aquí!' : 'Click o arrastra para subir fotos' }}</p>
+            <small>Arrastra todas las fotos que quieras - sin límite</small>
           </div>
         </div>
 
@@ -595,6 +680,55 @@ const getConfidenceColor = (confidence) => {
 .file-upload:hover {
   border-color: rgba(16, 163, 127, 0.8);
   background: rgba(16, 163, 127, 0.08);
+}
+
+.file-upload.dragging {
+  border-color: #10a37f;
+  background: rgba(16, 163, 127, 0.15);
+  border-width: 3px;
+  transform: scale(1.02);
+}
+
+.api-key-row {
+  display: flex;
+  gap: 12px;
+}
+
+.api-key-row .input-field {
+  flex: 1;
+}
+
+.btn-save-key {
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #10a37f 0%, #059669 100%);
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+}
+
+.btn-save-key:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(16, 163, 127, 0.4);
+}
+
+.btn-save-key:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.api-saved-hint {
+  display: block;
+  margin-top: 6px;
+  color: #10a37f;
+  font-size: 0.8rem;
 }
 
 .upload-icon {
