@@ -1,54 +1,22 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useAuth } from '../composables/useAuth'
 
-const { userSettings, saveApiKey } = useAuth()
+const { userSettings } = useAuth()
 
 const emit = defineEmits(['close', 'import'])
 
-// Use API key from Firestore (userSettings) with localStorage fallback
-const apiKey = ref('')
 const images = ref([])
 const isLoading = ref(false)
 const statusText = ref('')
 const analyzedItems = ref([])
 const lightboxImage = ref(null)
-const savingApiKey = ref(false)
 
-// Load API key on mount
-onMounted(() => {
-  // Priority: Firestore > localStorage
-  if (userSettings.value?.openaiApiKey) {
-    apiKey.value = userSettings.value.openaiApiKey
-  } else {
-    apiKey.value = localStorage.getItem('openaiApiKey') || ''
-  }
-})
+// Get API key from userSettings (managed in Settings modal)
+const apiKey = computed(() => userSettings.value?.openaiApiKey || '')
 
 const hasResults = computed(() => analyzedItems.value.length > 0)
 const hasImages = computed(() => images.value.length > 0)
-
-// Save API key to Firestore
-const handleSaveApiKey = async () => {
-  if (!apiKey.value.trim()) return
-
-  savingApiKey.value = true
-  try {
-    await saveApiKey(apiKey.value)
-    localStorage.setItem('openaiApiKey', apiKey.value)
-    statusText.value = 'API Key saved successfully'
-    setTimeout(() => {
-      if (statusText.value === 'API Key saved successfully') {
-        statusText.value = ''
-      }
-    }, 2000)
-  } catch (error) {
-    console.error('Error saving API key:', error)
-    statusText.value = 'Error saving API Key'
-  } finally {
-    savingApiKey.value = false
-  }
-}
 
 // Convert image file to JPEG using canvas
 const convertToJpeg = (file) => {
@@ -207,16 +175,14 @@ const cropImage = (imageDataUrl, bbox) => {
 
 // Analyze all images with GPT-4 Vision
 const analyzeImages = async () => {
-  if (!apiKey.value.trim()) {
-    alert('Please enter your OpenAI API Key')
+  if (!apiKey.value) {
+    alert('Please configure your OpenAI API Key in Settings (⚙️ button)')
     return
   }
   if (images.value.length === 0) {
     alert('Please upload at least one image')
     return
   }
-
-  localStorage.setItem('openaiApiKey', apiKey.value)
 
   isLoading.value = true
   statusText.value = 'Analyzing images with GPT-4 Vision...'
@@ -414,32 +380,14 @@ const categories = [
           <strong>Supports bulk upload AND multiple products per image!</strong> (like catalog pages)
         </p>
 
-        <!-- API Key -->
-        <div class="form-group">
-          <label>
-            OpenAI API Key
-            (<a href="https://platform.openai.com/api-keys" target="_blank">get one here</a>)
-          </label>
-          <div class="api-key-row">
-            <input
-              type="password"
-              v-model="apiKey"
-              placeholder="sk-..."
-              class="input-field mono"
-            >
-            <button
-              class="btn-save-key"
-              @click="handleSaveApiKey"
-              :disabled="savingApiKey || !apiKey.trim()"
-              :title="userSettings?.openaiApiKey ? 'API Key saved - Click to update' : 'Save API Key'"
-            >
-              <span v-if="savingApiKey" class="spinner-small"></span>
-              <span v-else>{{ userSettings?.openaiApiKey ? '✓ Saved' : '💾 Save' }}</span>
-            </button>
-          </div>
-          <small v-if="userSettings?.openaiApiKey" class="api-saved-hint">
-            Your API key is saved to your account
-          </small>
+        <!-- API Key Status -->
+        <div class="api-status-bar" :class="{ 'has-key': userSettings?.openaiApiKey }">
+          <span v-if="userSettings?.openaiApiKey" class="api-status">
+            ✓ API Key configured
+          </span>
+          <span v-else class="api-status missing">
+            ⚠️ No API Key - Configure in Settings (⚙️ button)
+          </span>
         </div>
 
         <!-- Image Upload -->
@@ -649,6 +597,28 @@ const categories = [
   font-size: 1rem;
 }
 
+.api-status-bar {
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  background: rgba(220, 53, 69, 0.15);
+  border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+.api-status-bar.has-key {
+  background: rgba(168, 85, 247, 0.15);
+  border-color: rgba(168, 85, 247, 0.3);
+}
+
+.api-status {
+  font-size: 0.9rem;
+  color: #a855f7;
+}
+
+.api-status.missing {
+  color: #ff6b6b;
+}
+
 .modal-footer {
   padding: 20px 25px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -675,48 +645,6 @@ const categories = [
 
 .form-group a {
   color: #a855f7;
-}
-
-.api-key-row {
-  display: flex;
-  gap: 12px;
-}
-
-.api-key-row .input-field {
-  flex: 1;
-}
-
-.btn-save-key {
-  padding: 14px 20px;
-  background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
-  border: none;
-  border-radius: 10px;
-  color: #fff;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.3s ease;
-}
-
-.btn-save-key:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
-}
-
-.btn-save-key:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.api-saved-hint {
-  display: block;
-  margin-top: 6px;
-  color: #a855f7;
-  font-size: 0.8rem;
 }
 
 .input-field {
@@ -1197,15 +1125,6 @@ const categories = [
 
   .modal-body {
     padding: 20px;
-  }
-
-  .api-key-row {
-    flex-direction: column;
-  }
-
-  .btn-save-key {
-    width: 100%;
-    justify-content: center;
   }
 
   .images-grid {

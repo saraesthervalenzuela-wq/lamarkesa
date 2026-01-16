@@ -8,10 +8,12 @@ import JewelryTable from '../components/JewelryTable.vue'
 import AIImportModal from '../components/AIImportModal.vue'
 import ImageAnalyzerModal from '../components/ImageAnalyzerModal.vue'
 import PhotoMatcherModal from '../components/PhotoMatcherModal.vue'
+import SettingsModal from '../components/SettingsModal.vue'
 
 const showAIModal = ref(false)
 const showImageAnalyzer = ref(false)
 const showPhotoMatcher = ref(false)
+const showSettings = ref(false)
 
 const {
   loading,
@@ -288,6 +290,17 @@ const handleAssignPhotos = async (assignments) => {
       @close="showPhotoMatcher = false"
       @assign-photos="handleAssignPhotos"
     />
+
+    <!-- Settings Modal -->
+    <SettingsModal
+      v-if="showSettings"
+      @close="showSettings = false"
+    />
+
+    <!-- Settings Button (Fixed) -->
+    <button class="settings-fab" @click="showSettings = true" title="Settings">
+      ⚙️
+    </button>
   </div>
 </template>
 
@@ -298,9 +311,41 @@ const handleAssignPhotos = async (assignments) => {
   padding: 30px 40px;
 }
 
+.settings-fab {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #d4af37 0%, #c9a227 100%);
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
+  transition: all 0.3s ease;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-fab:hover {
+  transform: scale(1.1) rotate(90deg);
+  box-shadow: 0 8px 30px rgba(212, 175, 55, 0.6);
+}
+
 @media (max-width: 600px) {
   .admin-container {
     padding: 20px 15px;
+  }
+
+  .settings-fab {
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    font-size: 1.3rem;
   }
 }
 </style>

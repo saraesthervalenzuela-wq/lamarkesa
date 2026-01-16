@@ -1,8 +1,8 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useAuth } from '../composables/useAuth'
 
-const { userSettings, saveApiKey } = useAuth()
+const { userSettings } = useAuth()
 
 const props = defineProps({
   products: {
@@ -13,25 +13,15 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'assign-photos'])
 
-// Use API key from Firestore (userSettings) with localStorage fallback
-const apiKey = ref('')
 const photos = ref([])
 const isLoading = ref(false)
 const statusText = ref('')
 const matches = ref([])
 const lightboxImage = ref(null)
 const isDragging = ref(false)
-const savingApiKey = ref(false)
 
-// Load API key on mount
-onMounted(() => {
-  // Priority: Firestore > localStorage
-  if (userSettings.value?.openaiApiKey) {
-    apiKey.value = userSettings.value.openaiApiKey
-  } else {
-    apiKey.value = localStorage.getItem('openaiApiKey') || ''
-  }
-})
+// Get API key from userSettings (managed in Settings modal)
+const apiKey = computed(() => userSettings.value?.openaiApiKey || '')
 
 // Products without images
 const productsWithoutPhotos = computed(() => {
@@ -40,28 +30,6 @@ const productsWithoutPhotos = computed(() => {
 
 const hasPhotos = computed(() => photos.value.length > 0)
 const hasMatches = computed(() => matches.value.length > 0)
-
-// Save API key to Firestore
-const handleSaveApiKey = async () => {
-  if (!apiKey.value.trim()) return
-
-  savingApiKey.value = true
-  try {
-    await saveApiKey(apiKey.value)
-    localStorage.setItem('openaiApiKey', apiKey.value)
-    statusText.value = 'API Key saved successfully'
-    setTimeout(() => {
-      if (statusText.value === 'API Key saved successfully') {
-        statusText.value = ''
-      }
-    }, 2000)
-  } catch (error) {
-    console.error('Error saving API key:', error)
-    statusText.value = 'Error saving API Key'
-  } finally {
-    savingApiKey.value = false
-  }
-}
 
 // Convert image to JPEG using canvas
 const convertToJpeg = (file) => {
@@ -188,8 +156,8 @@ const clearAll = () => {
 
 // AI Match photos to products
 const matchPhotos = async () => {
-  if (!apiKey.value.trim()) {
-    alert('Please enter your OpenAI API Key')
+  if (!apiKey.value) {
+    alert('Please configure your OpenAI API Key in Settings (⚙️ button)')
     return
   }
   if (photos.value.length === 0) {
@@ -200,8 +168,6 @@ const matchPhotos = async () => {
     alert('All products already have photos!')
     return
   }
-
-  localStorage.setItem('openaiApiKey', apiKey.value)
 
   isLoading.value = true
   matches.value = []
@@ -370,32 +336,14 @@ const getConfidenceColor = (confidence) => {
           <strong>{{ productsWithoutPhotos.length }} products</strong> are waiting for photos.
         </p>
 
-        <!-- API Key -->
-        <div class="form-group">
-          <label>
-            OpenAI API Key
-            (<a href="https://platform.openai.com/api-keys" target="_blank">get one here</a>)
-          </label>
-          <div class="api-key-row">
-            <input
-              type="password"
-              v-model="apiKey"
-              placeholder="sk-..."
-              class="input-field mono"
-            >
-            <button
-              class="btn-save-key"
-              @click="handleSaveApiKey"
-              :disabled="savingApiKey || !apiKey.trim()"
-              :title="userSettings?.openaiApiKey ? 'API Key saved - Click to update' : 'Save API Key'"
-            >
-              <span v-if="savingApiKey" class="spinner-small"></span>
-              <span v-else>{{ userSettings?.openaiApiKey ? '✓ Saved' : '💾 Save' }}</span>
-            </button>
-          </div>
-          <small v-if="userSettings?.openaiApiKey" class="api-saved-hint">
-            Your API key is saved to your account
-          </small>
+        <!-- API Key Status -->
+        <div class="api-status-bar" :class="{ 'has-key': userSettings?.openaiApiKey }">
+          <span v-if="userSettings?.openaiApiKey" class="api-status">
+            ✓ API Key configured
+          </span>
+          <span v-else class="api-status missing">
+            ⚠️ No API Key - Configure in Settings (⚙️ button)
+          </span>
         </div>
 
         <!-- Photo Upload with Drag & Drop -->
@@ -617,6 +565,28 @@ const getConfidenceColor = (confidence) => {
   color: #10a37f;
 }
 
+.api-status-bar {
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  background: rgba(220, 53, 69, 0.15);
+  border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+.api-status-bar.has-key {
+  background: rgba(16, 163, 127, 0.15);
+  border-color: rgba(16, 163, 127, 0.3);
+}
+
+.api-status {
+  font-size: 0.9rem;
+  color: #10a37f;
+}
+
+.api-status.missing {
+  color: #ff6b6b;
+}
+
 .modal-footer {
   padding: 20px 25px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -687,48 +657,6 @@ const getConfidenceColor = (confidence) => {
   background: rgba(16, 163, 127, 0.15);
   border-width: 3px;
   transform: scale(1.02);
-}
-
-.api-key-row {
-  display: flex;
-  gap: 12px;
-}
-
-.api-key-row .input-field {
-  flex: 1;
-}
-
-.btn-save-key {
-  padding: 14px 20px;
-  background: linear-gradient(135deg, #10a37f 0%, #059669 100%);
-  border: none;
-  border-radius: 10px;
-  color: #fff;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.3s ease;
-}
-
-.btn-save-key:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(16, 163, 127, 0.4);
-}
-
-.btn-save-key:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.api-saved-hint {
-  display: block;
-  margin-top: 6px;
-  color: #10a37f;
-  font-size: 0.8rem;
 }
 
 .upload-icon {
@@ -1174,15 +1102,6 @@ const getConfidenceColor = (confidence) => {
     max-width: 100%;
     max-height: 100vh;
     border-radius: 0;
-  }
-
-  .api-key-row {
-    flex-direction: column;
-  }
-
-  .btn-save-key {
-    width: 100%;
-    justify-content: center;
   }
 
   .match-card {
