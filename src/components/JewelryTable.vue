@@ -316,9 +316,9 @@ const getSpecialCollectionLabel = (collection) => {
 
 .table-header {
   display: grid;
-  grid-template-columns: 100px minmax(120px, 1fr) 100px 110px 70px 90px 100px 60px 70px 70px;
-  gap: 8px;
-  padding: 15px;
+  grid-template-columns: 120px minmax(180px, 1.5fr) 120px 130px 80px 110px 130px 70px 90px 90px;
+  gap: 12px;
+  padding: 18px 25px;
   background: linear-gradient(135deg, #FDFAF6 0%, #FAF7F2 100%);
   border-bottom: 1px solid rgba(183, 152, 72, 0.12);
   font-size: 0.7rem;
