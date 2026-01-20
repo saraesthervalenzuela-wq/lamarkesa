@@ -12,8 +12,10 @@ const emit = defineEmits(['add'])
 
 const name = ref('')
 const category = ref('rings')
+const collection = ref('')
 const sku = ref('')
 const price = ref('')
+const comment = ref('')
 
 const categories = [
   { value: 'rings', label: 'Anillos' },
@@ -24,21 +26,34 @@ const categories = [
   { value: 'other', label: 'Otros' }
 ]
 
+const collections = [
+  { value: '', label: 'Sin colección' },
+  { value: 'vermeil', label: 'Vermeil' },
+  { value: 'solid_gold', label: 'Solid Gold' },
+  { value: 'bridal_sets', label: 'Bridal Sets' },
+  { value: 'engagement_rings', label: 'Engagement Rings' },
+  { value: 'wedding_band', label: 'Wedding Band' }
+]
+
 const addItem = () => {
   if (!name.value.trim()) return
 
   emit('add', {
     name: name.value.trim(),
     category: category.value,
+    collection: collection.value,
     sku: sku.value.trim(),
     price: parseFloat(price.value) || 0,
+    comment: comment.value.trim(),
     image: ''
   })
 
   // Reset form
   name.value = ''
+  collection.value = ''
   sku.value = ''
   price.value = ''
+  comment.value = ''
 }
 
 const handleKeypress = (event) => {
@@ -68,6 +83,12 @@ const handleKeypress = (event) => {
       </option>
     </select>
 
+    <select class="grid-select" v-model="collection">
+      <option v-for="col in collections" :key="col.value" :value="col.value">
+        {{ col.label }}
+      </option>
+    </select>
+
     <input
       type="text"
       class="grid-input"
@@ -82,6 +103,13 @@ const handleKeypress = (event) => {
       placeholder="Precio"
       step="0.01"
       @keypress="handleKeypress"
+    />
+
+    <input
+      type="text"
+      class="grid-input"
+      v-model="comment"
+      placeholder="Comentario (opcional)"
     />
 
     <button class="grid-add-btn" @click="addItem">
@@ -107,6 +135,12 @@ const handleKeypress = (event) => {
       </option>
     </select>
 
+    <select class="collection-select" v-model="collection">
+      <option v-for="col in collections" :key="col.value" :value="col.value">
+        {{ col.label }}
+      </option>
+    </select>
+
     <input
       type="text"
       class="editable-field sku-field"
@@ -121,6 +155,13 @@ const handleKeypress = (event) => {
       placeholder="0.00"
       step="0.01"
       @keypress="handleKeypress"
+    >
+
+    <input
+      type="text"
+      class="editable-field comment-field"
+      v-model="comment"
+      placeholder="Comentario..."
     >
 
     <button class="btn btn-primary btn-small" @click="addItem">Agregar</button>
@@ -211,17 +252,17 @@ const handleKeypress = (event) => {
 /* List Mode (Table Row) Styles */
 .new-row {
   display: grid;
-  grid-template-columns: 180px 1fr 180px 160px 140px 100px;
-  gap: 15px;
-  padding: 18px 25px;
+  grid-template-columns: 120px minmax(150px, 1fr) 120px 130px 100px 80px 140px 80px;
+  gap: 10px;
+  padding: 18px 20px;
   background: linear-gradient(135deg, #FDFAF6 0%, #FAF7F2 100%);
   border-top: 1px dashed rgba(183, 152, 72, 0.3);
   align-items: center;
 }
 
 .add-btn {
-  width: 170px;
-  height: 170px;
+  width: 110px;
+  height: 110px;
   border-radius: 10px;
   border: 2px dashed rgba(183, 152, 72, 0.4);
   background: transparent;
@@ -296,6 +337,39 @@ const handleKeypress = (event) => {
 .category-select option {
   background: #fff;
   color: #333;
+}
+
+.collection-select {
+  background: #fff;
+  border: 1px solid #E8E8E8;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #666;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.collection-select:focus {
+  outline: none;
+  border-color: #B79848;
+  box-shadow: 0 0 0 3px rgba(183, 152, 72, 0.1);
+}
+
+.collection-select option {
+  background: #fff;
+  color: #333;
+}
+
+.comment-field {
+  font-size: 0.85rem;
+  color: #666;
+  font-style: italic;
+}
+
+.comment-field::placeholder {
+  color: #bbb;
+  font-style: italic;
 }
 
 .btn {

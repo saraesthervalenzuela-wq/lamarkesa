@@ -22,6 +22,15 @@ const categories = [
   { value: 'other', label: 'Other' }
 ]
 
+const collections = [
+  { value: '', label: 'Sin colección' },
+  { value: 'vermeil', label: 'Vermeil' },
+  { value: 'solid_gold', label: 'Solid Gold' },
+  { value: 'bridal_sets', label: 'Bridal Sets' },
+  { value: 'engagement_rings', label: 'Engagement Rings' },
+  { value: 'wedding_band', label: 'Wedding Band' }
+]
+
 const handleImageClick = () => {
   // If image exists, show lightbox; otherwise open file picker
   if (props.item.image) {
@@ -96,6 +105,16 @@ const confirmDelete = () => {
       </option>
     </select>
 
+    <select
+      class="collection-select"
+      :value="item.collection || ''"
+      @change="emit('update', 'collection', $event.target.value)"
+    >
+      <option v-for="col in collections" :key="col.value" :value="col.value">
+        {{ col.label }}
+      </option>
+    </select>
+
     <input
       type="text"
       class="editable-field sku-field"
@@ -110,6 +129,14 @@ const confirmDelete = () => {
       :value="item.price"
       step="0.01"
       @change="emit('update', 'price', parseFloat($event.target.value) || 0)"
+    >
+
+    <input
+      type="text"
+      class="editable-field comment-field"
+      :value="item.comment || ''"
+      placeholder="Agregar comentario..."
+      @change="emit('update', 'comment', $event.target.value)"
     >
 
     <div class="row-actions">
@@ -127,9 +154,9 @@ const confirmDelete = () => {
 
 .table-row {
   display: grid;
-  grid-template-columns: 180px 1fr 180px 160px 140px 100px;
-  gap: 15px;
-  padding: 15px 25px;
+  grid-template-columns: 120px minmax(150px, 1fr) 120px 130px 100px 80px 140px 80px;
+  gap: 10px;
+  padding: 15px 20px;
   border-bottom: 1px solid #F0F0F0;
   align-items: center;
   transition: background 0.2s;
@@ -140,8 +167,8 @@ const confirmDelete = () => {
 }
 
 .row-image {
-  width: 170px;
-  height: 170px;
+  width: 110px;
+  height: 110px;
   border-radius: 10px;
   background: #F9F9F9;
   display: flex;
@@ -339,6 +366,45 @@ const confirmDelete = () => {
 .category-select option {
   background: #fff;
   color: #333;
+}
+
+.collection-select {
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #666;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.collection-select:hover {
+  background: #FAFAFA;
+  border-color: #E8E8E8;
+}
+
+.collection-select:focus {
+  outline: none;
+  background: #fff;
+  border-color: #B79848;
+  box-shadow: 0 0 0 3px rgba(183, 152, 72, 0.1);
+}
+
+.collection-select option {
+  background: #fff;
+  color: #333;
+}
+
+.comment-field {
+  font-size: 0.85rem;
+  color: #666;
+  font-style: italic;
+}
+
+.comment-field::placeholder {
+  color: #bbb;
+  font-style: italic;
 }
 
 .row-actions {

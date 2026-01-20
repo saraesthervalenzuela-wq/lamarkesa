@@ -27,9 +27,23 @@ const categories = [
   { value: 'other', label: 'Otros' }
 ]
 
+const collections = [
+  { value: '', label: 'Sin colección' },
+  { value: 'vermeil', label: 'Vermeil' },
+  { value: 'solid_gold', label: 'Solid Gold' },
+  { value: 'bridal_sets', label: 'Bridal Sets' },
+  { value: 'engagement_rings', label: 'Engagement Rings' },
+  { value: 'wedding_band', label: 'Wedding Band' }
+]
+
 const getCategoryLabel = (category) => {
   const cat = categories.find(c => c.value === category)
   return cat ? cat.label : 'Otro'
+}
+
+const getCollectionLabel = (collection) => {
+  const col = collections.find(c => c.value === collection)
+  return col ? col.label : ''
 }
 </script>
 
@@ -73,8 +87,10 @@ const getCategoryLabel = (category) => {
         <div>Image</div>
         <div>Name</div>
         <div>Category</div>
+        <div>Collection</div>
         <div>SKU</div>
         <div>Price</div>
+        <div>Comment</div>
         <div>Actions</div>
       </div>
 
@@ -173,6 +189,28 @@ const getCategoryLabel = (category) => {
               </select>
             </div>
 
+            <div class="grid-row">
+              <select
+                :value="item.collection || ''"
+                class="grid-collection-select"
+                @change="(e) => emit('update', item.id, 'collection', e.target.value)"
+              >
+                <option v-for="col in collections" :key="col.value" :value="col.value">
+                  {{ col.label }}
+                </option>
+              </select>
+            </div>
+
+            <div class="grid-comment">
+              <input
+                type="text"
+                :value="item.comment || ''"
+                class="grid-comment-input"
+                placeholder="Agregar comentario..."
+                @blur="(e) => e.target.value !== (item.comment || '') && emit('update', item.id, 'comment', e.target.value)"
+              />
+            </div>
+
             <div class="grid-footer">
               <div class="grid-price-wrap">
                 <span class="price-symbol">$</span>
@@ -260,9 +298,9 @@ const getCategoryLabel = (category) => {
 
 .table-header {
   display: grid;
-  grid-template-columns: 180px 1fr 180px 160px 140px 100px;
-  gap: 15px;
-  padding: 18px 25px;
+  grid-template-columns: 120px minmax(150px, 1fr) 120px 130px 100px 80px 140px 80px;
+  gap: 10px;
+  padding: 18px 20px;
   background: linear-gradient(135deg, #FDFAF6 0%, #FAF7F2 100%);
   border-bottom: 1px solid rgba(183, 152, 72, 0.12);
   font-size: 0.75rem;
@@ -480,6 +518,63 @@ const getCategoryLabel = (category) => {
   background: #fff;
   border-color: #B79848;
   box-shadow: 0 0 0 3px rgba(183, 152, 72, 0.1);
+}
+
+.grid-collection-select {
+  flex: 1;
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.grid-collection-select:hover {
+  background: #FAFAFA;
+  border-color: #E8E8E8;
+}
+
+.grid-collection-select:focus {
+  outline: none;
+  background: #fff;
+  border-color: #B79848;
+  box-shadow: 0 0 0 3px rgba(183, 152, 72, 0.1);
+}
+
+.grid-comment {
+  margin-bottom: 10px;
+}
+
+.grid-comment-input {
+  width: 100%;
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: #666;
+  font-style: italic;
+  transition: all 0.2s;
+}
+
+.grid-comment-input:hover {
+  background: #FAFAFA;
+  border-color: #E8E8E8;
+}
+
+.grid-comment-input:focus {
+  outline: none;
+  background: #fff;
+  border-color: #B79848;
+  box-shadow: 0 0 0 3px rgba(183, 152, 72, 0.1);
+}
+
+.grid-comment-input::placeholder {
+  color: #bbb;
+  font-style: italic;
 }
 
 .grid-footer {
