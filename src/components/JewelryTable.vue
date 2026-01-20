@@ -23,14 +23,30 @@ const categories = [
   { value: 'necklaces', label: 'Collares' },
   { value: 'bracelets', label: 'Pulseras' },
   { value: 'earrings', label: 'Aretes' },
+  { value: 'chains', label: 'Chains' },
+  { value: 'pendants', label: 'Pendants' },
   { value: 'watches', label: 'Relojes' },
   { value: 'other', label: 'Otros' }
 ]
 
-const collections = [
-  { value: '', label: 'Sin colección' },
-  { value: 'vermeil', label: 'Vermeil' },
+const materials = [
+  { value: '', label: 'Sin material' },
   { value: 'solid_gold', label: 'Solid Gold' },
+  { value: 'hollow', label: 'Hollow' },
+  { value: 'vermeil', label: 'Vermeil' },
+  { value: 'sterling_silver', label: 'Sterling Silver' },
+  { value: 'lab_grown', label: 'Lab Grown' }
+]
+
+const goldColors = [
+  { value: '', label: '-' },
+  { value: 'yellow', label: 'Yellow' },
+  { value: 'white', label: 'White' },
+  { value: 'tri_tone', label: 'Tri-tone' }
+]
+
+const specialCollections = [
+  { value: '', label: 'Sin colección' },
   { value: 'bridal_sets', label: 'Bridal Sets' },
   { value: 'engagement_rings', label: 'Engagement Rings' },
   { value: 'wedding_band', label: 'Wedding Band' }
@@ -41,8 +57,18 @@ const getCategoryLabel = (category) => {
   return cat ? cat.label : 'Otro'
 }
 
-const getCollectionLabel = (collection) => {
-  const col = collections.find(c => c.value === collection)
+const getMaterialLabel = (material) => {
+  const mat = materials.find(m => m.value === material)
+  return mat ? mat.label : '-'
+}
+
+const getGoldColorLabel = (color) => {
+  const gc = goldColors.find(c => c.value === color)
+  return gc ? gc.label : '-'
+}
+
+const getSpecialCollectionLabel = (collection) => {
+  const col = specialCollections.find(c => c.value === collection)
   return col ? col.label : ''
 }
 </script>
@@ -87,10 +113,12 @@ const getCollectionLabel = (collection) => {
         <div>Image</div>
         <div>Name</div>
         <div>Category</div>
+        <div>Material</div>
+        <div>Karat</div>
+        <div>Color</div>
         <div>Collection</div>
-        <div>SKU</div>
+        <div>Size</div>
         <div>Price</div>
-        <div>Comment</div>
         <div>Actions</div>
       </div>
 
@@ -171,13 +199,6 @@ const getCollectionLabel = (collection) => {
             />
 
             <div class="grid-row">
-              <input
-                type="text"
-                :value="item.sku"
-                class="grid-sku-input"
-                placeholder="SKU"
-                @blur="(e) => e.target.value !== item.sku && emit('update', item.id, 'sku', e.target.value)"
-              />
               <select
                 :value="item.category"
                 class="grid-category-select"
@@ -187,28 +208,25 @@ const getCollectionLabel = (collection) => {
                   {{ cat.label }}
                 </option>
               </select>
-            </div>
-
-            <div class="grid-row">
               <select
-                :value="item.collection || ''"
-                class="grid-collection-select"
-                @change="(e) => emit('update', item.id, 'collection', e.target.value)"
+                :value="item.material || ''"
+                class="grid-material-select"
+                @change="(e) => emit('update', item.id, 'material', e.target.value)"
               >
-                <option v-for="col in collections" :key="col.value" :value="col.value">
-                  {{ col.label }}
+                <option v-for="mat in materials" :key="mat.value" :value="mat.value">
+                  {{ mat.label }}
                 </option>
               </select>
             </div>
 
-            <div class="grid-comment">
-              <input
-                type="text"
-                :value="item.comment || ''"
-                class="grid-comment-input"
-                placeholder="Agregar comentario..."
-                @blur="(e) => e.target.value !== (item.comment || '') && emit('update', item.id, 'comment', e.target.value)"
-              />
+            <div class="grid-row">
+              <span v-if="item.karat" class="grid-badge">{{ item.karat }}</span>
+              <span v-if="item.goldColor" class="grid-badge gold-color">{{ getGoldColorLabel(item.goldColor) }}</span>
+              <span v-if="item.size" class="grid-badge size-badge">{{ item.size }}</span>
+            </div>
+
+            <div class="grid-row" v-if="item.specialCollection">
+              <span class="grid-collection-badge">{{ getSpecialCollectionLabel(item.specialCollection) }}</span>
             </div>
 
             <div class="grid-footer">
@@ -298,14 +316,14 @@ const getCollectionLabel = (collection) => {
 
 .table-header {
   display: grid;
-  grid-template-columns: 120px minmax(150px, 1fr) 120px 130px 100px 80px 140px 80px;
-  gap: 10px;
-  padding: 18px 20px;
+  grid-template-columns: 100px minmax(120px, 1fr) 100px 110px 70px 90px 100px 60px 70px 70px;
+  gap: 8px;
+  padding: 15px;
   background: linear-gradient(135deg, #FDFAF6 0%, #FAF7F2 100%);
   border-bottom: 1px solid rgba(183, 152, 72, 0.12);
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
+  letter-spacing: 1px;
   color: #999;
   font-weight: 600;
 }
@@ -542,6 +560,62 @@ const getCollectionLabel = (collection) => {
   background: #fff;
   border-color: #B79848;
   box-shadow: 0 0 0 3px rgba(183, 152, 72, 0.1);
+}
+
+.grid-material-select {
+  flex: 1;
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.grid-material-select:hover {
+  background: #FAFAFA;
+  border-color: #E8E8E8;
+}
+
+.grid-material-select:focus {
+  outline: none;
+  background: #fff;
+  border-color: #B79848;
+  box-shadow: 0 0 0 3px rgba(183, 152, 72, 0.1);
+}
+
+.grid-badge {
+  display: inline-block;
+  background: #F5F5F5;
+  color: #666;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.grid-badge.gold-color {
+  background: #FFF8E1;
+  color: #B79848;
+}
+
+.grid-badge.size-badge {
+  background: #E3F2FD;
+  color: #1976D2;
+}
+
+.grid-collection-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #B79848 0%, #D4AF37 100%);
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .grid-comment {

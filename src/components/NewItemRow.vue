@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 defineProps({
   gridMode: {
@@ -12,28 +12,83 @@ const emit = defineEmits(['add'])
 
 const name = ref('')
 const category = ref('rings')
-const collection = ref('')
-const sku = ref('')
+const material = ref('')
+const karat = ref('')
+const goldColor = ref('')
+const specialCollection = ref('')
+const size = ref('')
 const price = ref('')
-const comment = ref('')
 
 const categories = [
   { value: 'rings', label: 'Anillos' },
   { value: 'necklaces', label: 'Collares' },
   { value: 'earrings', label: 'Aretes' },
   { value: 'bracelets', label: 'Pulseras' },
+  { value: 'chains', label: 'Chains' },
+  { value: 'pendants', label: 'Pendants' },
   { value: 'watches', label: 'Relojes' },
   { value: 'other', label: 'Otros' }
 ]
 
-const collections = [
-  { value: '', label: 'Sin colección' },
-  { value: 'vermeil', label: 'Vermeil' },
+// Materials
+const materials = [
+  { value: '', label: 'Sin material' },
   { value: 'solid_gold', label: 'Solid Gold' },
+  { value: 'hollow', label: 'Hollow' },
+  { value: 'vermeil', label: 'Vermeil' },
+  { value: 'sterling_silver', label: 'Sterling Silver' },
+  { value: 'lab_grown', label: 'Lab Grown' }
+]
+
+// Karats based on material
+const karatOptions = {
+  solid_gold: [
+    { value: '', label: 'Quilate' },
+    { value: '10k', label: '10k' },
+    { value: '14k', label: '14k' }
+  ],
+  hollow: [
+    { value: '', label: 'Quilate' },
+    { value: '10k', label: '10k' },
+    { value: '14k', label: '14k' },
+    { value: '18k', label: '18k' }
+  ],
+  vermeil: [
+    { value: '', label: 'Quilate' },
+    { value: '10k', label: '10k' },
+    { value: '14k', label: '14k' },
+    { value: '18k', label: '18k' }
+  ]
+}
+
+// Gold colors (only for solid_gold)
+const goldColors = [
+  { value: '', label: 'Color' },
+  { value: 'yellow', label: 'Yellow Gold' },
+  { value: 'white', label: 'White Gold' },
+  { value: 'tri_tone', label: 'Tri-tone Gold' }
+]
+
+// Special collections
+const specialCollections = [
+  { value: '', label: 'Sin colección' },
   { value: 'bridal_sets', label: 'Bridal Sets' },
   { value: 'engagement_rings', label: 'Engagement Rings' },
   { value: 'wedding_band', label: 'Wedding Band' }
 ]
+
+// Computed properties for showing/hiding fields
+const showKarat = computed(() => {
+  return material.value === 'solid_gold' || material.value === 'hollow' || material.value === 'vermeil'
+})
+
+const showGoldColor = computed(() => {
+  return material.value === 'solid_gold'
+})
+
+const availableKarats = computed(() => {
+  return karatOptions[material.value] || []
+})
 
 const addItem = () => {
   if (!name.value.trim()) return
@@ -41,19 +96,23 @@ const addItem = () => {
   emit('add', {
     name: name.value.trim(),
     category: category.value,
-    collection: collection.value,
-    sku: sku.value.trim(),
+    material: material.value,
+    karat: karat.value,
+    goldColor: goldColor.value,
+    specialCollection: specialCollection.value,
+    size: size.value.trim(),
     price: parseFloat(price.value) || 0,
-    comment: comment.value.trim(),
     image: ''
   })
 
   // Reset form
   name.value = ''
-  collection.value = ''
-  sku.value = ''
+  material.value = ''
+  karat.value = ''
+  goldColor.value = ''
+  specialCollection.value = ''
+  size.value = ''
   price.value = ''
-  comment.value = ''
 }
 
 const handleKeypress = (event) => {
@@ -83,8 +142,26 @@ const handleKeypress = (event) => {
       </option>
     </select>
 
-    <select class="grid-select" v-model="collection">
-      <option v-for="col in collections" :key="col.value" :value="col.value">
+    <select class="grid-select" v-model="material">
+      <option v-for="mat in materials" :key="mat.value" :value="mat.value">
+        {{ mat.label }}
+      </option>
+    </select>
+
+    <select v-if="showKarat" class="grid-select" v-model="karat">
+      <option v-for="k in availableKarats" :key="k.value" :value="k.value">
+        {{ k.label }}
+      </option>
+    </select>
+
+    <select v-if="showGoldColor" class="grid-select" v-model="goldColor">
+      <option v-for="gc in goldColors" :key="gc.value" :value="gc.value">
+        {{ gc.label }}
+      </option>
+    </select>
+
+    <select class="grid-select" v-model="specialCollection">
+      <option v-for="col in specialCollections" :key="col.value" :value="col.value">
         {{ col.label }}
       </option>
     </select>
@@ -92,8 +169,8 @@ const handleKeypress = (event) => {
     <input
       type="text"
       class="grid-input"
-      v-model="sku"
-      placeholder="SKU (opcional)"
+      v-model="size"
+      placeholder="Talla (opcional)"
     />
 
     <input
@@ -103,13 +180,6 @@ const handleKeypress = (event) => {
       placeholder="Precio"
       step="0.01"
       @keypress="handleKeypress"
-    />
-
-    <input
-      type="text"
-      class="grid-input"
-      v-model="comment"
-      placeholder="Comentario (opcional)"
     />
 
     <button class="grid-add-btn" @click="addItem">
@@ -135,17 +205,42 @@ const handleKeypress = (event) => {
       </option>
     </select>
 
-    <select class="collection-select" v-model="collection">
-      <option v-for="col in collections" :key="col.value" :value="col.value">
+    <!-- Material -->
+    <select class="material-select" v-model="material">
+      <option v-for="mat in materials" :key="mat.value" :value="mat.value">
+        {{ mat.label }}
+      </option>
+    </select>
+
+    <!-- Karat -->
+    <select v-if="showKarat" class="karat-select" v-model="karat">
+      <option v-for="k in availableKarats" :key="k.value" :value="k.value">
+        {{ k.label }}
+      </option>
+    </select>
+    <div v-else class="placeholder-cell">-</div>
+
+    <!-- Gold Color -->
+    <select v-if="showGoldColor" class="color-select" v-model="goldColor">
+      <option v-for="gc in goldColors" :key="gc.value" :value="gc.value">
+        {{ gc.label }}
+      </option>
+    </select>
+    <div v-else class="placeholder-cell">-</div>
+
+    <!-- Special Collection -->
+    <select class="collection-select" v-model="specialCollection">
+      <option v-for="col in specialCollections" :key="col.value" :value="col.value">
         {{ col.label }}
       </option>
     </select>
 
+    <!-- Size -->
     <input
       type="text"
-      class="editable-field sku-field"
-      v-model="sku"
-      placeholder="SKU"
+      class="editable-field size-field"
+      v-model="size"
+      placeholder="Talla"
     >
 
     <input
@@ -155,13 +250,6 @@ const handleKeypress = (event) => {
       placeholder="0.00"
       step="0.01"
       @keypress="handleKeypress"
-    >
-
-    <input
-      type="text"
-      class="editable-field comment-field"
-      v-model="comment"
-      placeholder="Comentario..."
     >
 
     <button class="btn btn-primary btn-small" @click="addItem">Agregar</button>
@@ -252,9 +340,9 @@ const handleKeypress = (event) => {
 /* List Mode (Table Row) Styles */
 .new-row {
   display: grid;
-  grid-template-columns: 120px minmax(150px, 1fr) 120px 130px 100px 80px 140px 80px;
-  gap: 10px;
-  padding: 18px 20px;
+  grid-template-columns: 100px minmax(120px, 1fr) 100px 110px 70px 90px 100px 60px 70px 70px;
+  gap: 8px;
+  padding: 15px;
   background: linear-gradient(135deg, #FDFAF6 0%, #FAF7F2 100%);
   border-top: 1px dashed rgba(183, 152, 72, 0.3);
   align-items: center;
@@ -359,6 +447,46 @@ const handleKeypress = (event) => {
 .collection-select option {
   background: #fff;
   color: #333;
+}
+
+.material-select,
+.karat-select,
+.color-select {
+  background: #fff;
+  border: 1px solid #E8E8E8;
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: #666;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.material-select:focus,
+.karat-select:focus,
+.color-select:focus {
+  outline: none;
+  border-color: #B79848;
+  box-shadow: 0 0 0 3px rgba(183, 152, 72, 0.1);
+}
+
+.material-select option,
+.karat-select option,
+.color-select option {
+  background: #fff;
+  color: #333;
+}
+
+.placeholder-cell {
+  color: #ccc;
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+.size-field {
+  font-size: 0.85rem;
+  color: #666;
+  text-align: center;
 }
 
 .comment-field {

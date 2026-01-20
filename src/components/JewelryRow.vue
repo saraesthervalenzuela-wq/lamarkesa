@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const props = defineProps({
   item: {
@@ -18,18 +18,72 @@ const categories = [
   { value: 'necklaces', label: 'Necklaces' },
   { value: 'earrings', label: 'Earrings' },
   { value: 'bracelets', label: 'Bracelets' },
+  { value: 'chains', label: 'Chains' },
+  { value: 'pendants', label: 'Pendants' },
   { value: 'watches', label: 'Watches' },
   { value: 'other', label: 'Other' }
 ]
 
-const collections = [
-  { value: '', label: 'Sin colección' },
-  { value: 'vermeil', label: 'Vermeil' },
+// Materials
+const materials = [
+  { value: '', label: 'Sin material' },
   { value: 'solid_gold', label: 'Solid Gold' },
+  { value: 'hollow', label: 'Hollow' },
+  { value: 'vermeil', label: 'Vermeil' },
+  { value: 'sterling_silver', label: 'Sterling Silver' },
+  { value: 'lab_grown', label: 'Lab Grown' }
+]
+
+// Karats based on material
+const karatOptions = {
+  solid_gold: [
+    { value: '', label: 'Sin quilate' },
+    { value: '10k', label: '10k' },
+    { value: '14k', label: '14k' }
+  ],
+  hollow: [
+    { value: '', label: 'Sin quilate' },
+    { value: '10k', label: '10k' },
+    { value: '14k', label: '14k' },
+    { value: '18k', label: '18k' }
+  ],
+  vermeil: [
+    { value: '', label: 'Sin quilate' },
+    { value: '10k', label: '10k' },
+    { value: '14k', label: '14k' },
+    { value: '18k', label: '18k' }
+  ]
+}
+
+// Gold colors (only for solid_gold)
+const goldColors = [
+  { value: '', label: 'Sin color' },
+  { value: 'yellow', label: 'Yellow Gold' },
+  { value: 'white', label: 'White Gold' },
+  { value: 'tri_tone', label: 'Tri-tone Gold' }
+]
+
+// Special collections
+const specialCollections = [
+  { value: '', label: 'Sin colección' },
   { value: 'bridal_sets', label: 'Bridal Sets' },
   { value: 'engagement_rings', label: 'Engagement Rings' },
   { value: 'wedding_band', label: 'Wedding Band' }
 ]
+
+// Computed properties for showing/hiding fields
+const showKarat = computed(() => {
+  const mat = props.item.material
+  return mat === 'solid_gold' || mat === 'hollow' || mat === 'vermeil'
+})
+
+const showGoldColor = computed(() => {
+  return props.item.material === 'solid_gold'
+})
+
+const availableKarats = computed(() => {
+  return karatOptions[props.item.material] || []
+})
 
 const handleImageClick = () => {
   // If image exists, show lightbox; otherwise open file picker
@@ -105,22 +159,61 @@ const confirmDelete = () => {
       </option>
     </select>
 
+    <!-- Material -->
+    <select
+      class="material-select"
+      :value="item.material || ''"
+      @change="emit('update', 'material', $event.target.value)"
+    >
+      <option v-for="mat in materials" :key="mat.value" :value="mat.value">
+        {{ mat.label }}
+      </option>
+    </select>
+
+    <!-- Karat (conditional) -->
+    <select
+      v-if="showKarat"
+      class="karat-select"
+      :value="item.karat || ''"
+      @change="emit('update', 'karat', $event.target.value)"
+    >
+      <option v-for="k in availableKarats" :key="k.value" :value="k.value">
+        {{ k.label }}
+      </option>
+    </select>
+    <div v-else class="placeholder-cell">-</div>
+
+    <!-- Gold Color (conditional) -->
+    <select
+      v-if="showGoldColor"
+      class="color-select"
+      :value="item.goldColor || ''"
+      @change="emit('update', 'goldColor', $event.target.value)"
+    >
+      <option v-for="gc in goldColors" :key="gc.value" :value="gc.value">
+        {{ gc.label }}
+      </option>
+    </select>
+    <div v-else class="placeholder-cell">-</div>
+
+    <!-- Special Collection -->
     <select
       class="collection-select"
-      :value="item.collection || ''"
-      @change="emit('update', 'collection', $event.target.value)"
+      :value="item.specialCollection || ''"
+      @change="emit('update', 'specialCollection', $event.target.value)"
     >
-      <option v-for="col in collections" :key="col.value" :value="col.value">
+      <option v-for="col in specialCollections" :key="col.value" :value="col.value">
         {{ col.label }}
       </option>
     </select>
 
+    <!-- Size -->
     <input
       type="text"
-      class="editable-field sku-field"
-      :value="item.sku || ''"
-      placeholder="-"
-      @change="emit('update', 'sku', $event.target.value)"
+      class="editable-field size-field"
+      :value="item.size || ''"
+      placeholder="Talla"
+      @change="emit('update', 'size', $event.target.value)"
     >
 
     <input
@@ -129,14 +222,6 @@ const confirmDelete = () => {
       :value="item.price"
       step="0.01"
       @change="emit('update', 'price', parseFloat($event.target.value) || 0)"
-    >
-
-    <input
-      type="text"
-      class="editable-field comment-field"
-      :value="item.comment || ''"
-      placeholder="Agregar comentario..."
-      @change="emit('update', 'comment', $event.target.value)"
     >
 
     <div class="row-actions">
@@ -154,9 +239,9 @@ const confirmDelete = () => {
 
 .table-row {
   display: grid;
-  grid-template-columns: 120px minmax(150px, 1fr) 120px 130px 100px 80px 140px 80px;
-  gap: 10px;
-  padding: 15px 20px;
+  grid-template-columns: 100px minmax(120px, 1fr) 100px 110px 70px 90px 100px 60px 70px 70px;
+  gap: 8px;
+  padding: 12px 15px;
   border-bottom: 1px solid #F0F0F0;
   align-items: center;
   transition: background 0.2s;
@@ -394,6 +479,54 @@ const confirmDelete = () => {
 .collection-select option {
   background: #fff;
   color: #333;
+}
+
+.material-select,
+.karat-select,
+.color-select {
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: #666;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.material-select:hover,
+.karat-select:hover,
+.color-select:hover {
+  background: #FAFAFA;
+  border-color: #E8E8E8;
+}
+
+.material-select:focus,
+.karat-select:focus,
+.color-select:focus {
+  outline: none;
+  background: #fff;
+  border-color: #B79848;
+  box-shadow: 0 0 0 3px rgba(183, 152, 72, 0.1);
+}
+
+.material-select option,
+.karat-select option,
+.color-select option {
+  background: #fff;
+  color: #333;
+}
+
+.placeholder-cell {
+  color: #ccc;
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+.size-field {
+  font-size: 0.85rem;
+  color: #666;
+  text-align: center;
 }
 
 .comment-field {

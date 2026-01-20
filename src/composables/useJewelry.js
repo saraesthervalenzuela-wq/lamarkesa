@@ -21,6 +21,7 @@ const jewelry = ref([])
 const loading = ref(true)
 const searchQuery = ref('')
 const categoryFilter = ref('')
+const materialFilter = ref('')
 const sortBy = ref('newest')
 
 // Inicializar listener de Firestore
@@ -69,6 +70,11 @@ export function useJewelry() {
     // Filtro de categoría
     if (categoryFilter.value) {
       items = items.filter(item => item.category === categoryFilter.value)
+    }
+
+    // Filtro de material
+    if (materialFilter.value) {
+      items = items.filter(item => item.material === materialFilter.value)
     }
 
     // Ordenamiento
@@ -285,6 +291,7 @@ export function useJewelry() {
     loading,
     searchQuery,
     categoryFilter,
+    materialFilter,
     sortBy,
     stats,
     filteredJewelry,

@@ -8,6 +8,7 @@ const {
   initializeListener,
   searchQuery,
   categoryFilter,
+  materialFilter,
   sortBy
 } = useJewelry()
 
@@ -38,13 +39,30 @@ const categories = [
   { value: 'necklaces', label: 'Collares' },
   { value: 'bracelets', label: 'Pulseras' },
   { value: 'earrings', label: 'Aretes' },
+  { value: 'chains', label: 'Chains' },
+  { value: 'pendants', label: 'Pendants' },
   { value: 'watches', label: 'Relojes' },
   { value: 'other', label: 'Otros' }
+]
+
+// Materiales para el filtro
+const materials = [
+  { value: '', label: 'Todos los materiales' },
+  { value: 'solid_gold', label: 'Solid Gold' },
+  { value: 'hollow', label: 'Hollow' },
+  { value: 'vermeil', label: 'Vermeil' },
+  { value: 'sterling_silver', label: 'Sterling Silver' },
+  { value: 'lab_grown', label: 'Lab Grown' }
 ]
 
 const getCategoryLabel = (category) => {
   const cat = categories.find(c => c.value === category)
   return cat ? cat.label : 'Otro'
+}
+
+const getMaterialLabel = (material) => {
+  const mat = materials.find(m => m.value === material)
+  return mat ? mat.label : ''
 }
 </script>
 
@@ -65,6 +83,14 @@ const getCategoryLabel = (category) => {
         <select v-model="categoryFilter" class="filter-select">
           <option v-for="cat in categories" :key="cat.value" :value="cat.value">
             {{ cat.label }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <select v-model="materialFilter" class="filter-select">
+          <option v-for="mat in materials" :key="mat.value" :value="mat.value">
+            {{ mat.label }}
           </option>
         </select>
       </div>
@@ -136,6 +162,10 @@ const getCategoryLabel = (category) => {
           </div>
           <div class="product-category">
             {{ getCategoryLabel(item.category) }}
+          </div>
+          <div v-if="item.material" class="product-material">
+            {{ getMaterialLabel(item.material) }}
+            <span v-if="item.karat">{{ item.karat }}</span>
           </div>
           <div v-if="item.image" class="zoom-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -389,6 +419,26 @@ const getCategoryLabel = (category) => {
   font-weight: 500;
   letter-spacing: 0.5px;
   text-transform: uppercase;
+}
+
+.product-material {
+  position: absolute;
+  top: 48px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #666;
+  padding: 5px 12px;
+  border-radius: 15px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.product-material span {
+  margin-left: 4px;
+  color: #B79848;
+  font-weight: 600;
 }
 
 .zoom-icon {
