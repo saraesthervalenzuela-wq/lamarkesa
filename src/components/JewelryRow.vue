@@ -252,9 +252,9 @@ const confirmDelete = () => {
 <style scoped>
 .table-row {
   display: grid;
-  grid-template-columns: 100px minmax(120px, 1fr) 90px 100px 60px 90px 100px 50px 70px 80px;
-  gap: 8px;
-  padding: 14px 15px;
+  grid-template-columns: 110px minmax(150px, 1.5fr) 100px 120px 70px 100px 120px 60px 80px 100px;
+  gap: 12px;
+  padding: 16px 20px;
   border-bottom: 1px solid #F0F0F0;
   align-items: center;
   transition: background 0.2s;

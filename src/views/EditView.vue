@@ -58,8 +58,8 @@ const handleUploadImage = async (id, file) => {
 <template>
   <div class="edit-container">
     <header class="header">
-      <h1>Editar Inventario</h1>
-      <p>Agrega productos, cambia fotos y actualiza precios</p>
+      <h1>Edit Inventory</h1>
+      <p>Add products, change photos and update prices</p>
     </header>
 
     <SearchFilter
@@ -81,9 +81,9 @@ const handleUploadImage = async (id, file) => {
 
 <style scoped>
 .edit-container {
-  max-width: 1800px;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 20px 40px;
+  padding: 20px 20px;
 }
 
 .header {

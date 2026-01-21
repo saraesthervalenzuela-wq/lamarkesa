@@ -313,8 +313,8 @@ defineExpose({ handleKeydown })
 }
 
 .size-normal {
-  width: 90px;
-  height: 90px;
+  width: 100px;
+  height: 100px;
 }
 
 .size-large {

@@ -348,7 +348,7 @@ const handleAssignPhotos = async (assignments) => {
 
     <!-- FAB Buttons -->
     <div class="fab-container">
-      <button class="fab-btn categories-fab" @click="showCategoryManager = true" title="Gestionar Categorias">
+      <button class="fab-btn categories-fab" @click="showCategoryManager = true" title="Manage Categories">
         📁
       </button>
       <button class="fab-btn settings-fab" @click="showSettings = true" title="Settings">
@@ -360,9 +360,9 @@ const handleAssignPhotos = async (assignments) => {
 
 <style scoped>
 .admin-container {
-  max-width: 1800px;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 30px 40px;
+  padding: 30px 20px;
 }
 
 .fab-container {
