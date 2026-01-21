@@ -9,11 +9,13 @@ import AIImportModal from '../components/AIImportModal.vue'
 import ImageAnalyzerModal from '../components/ImageAnalyzerModal.vue'
 import PhotoMatcherModal from '../components/PhotoMatcherModal.vue'
 import SettingsModal from '../components/SettingsModal.vue'
+import CategoryManagerModal from '../components/CategoryManagerModal.vue'
 
 const showAIModal = ref(false)
 const showImageAnalyzer = ref(false)
 const showPhotoMatcher = ref(false)
 const showSettings = ref(false)
+const showCategoryManager = ref(false)
 
 const {
   loading,
@@ -308,10 +310,21 @@ const handleAssignPhotos = async (assignments) => {
       @close="showSettings = false"
     />
 
-    <!-- Settings Button (Fixed) -->
-    <button class="settings-fab" @click="showSettings = true" title="Settings">
-      ⚙️
-    </button>
+    <!-- Category Manager Modal -->
+    <CategoryManagerModal
+      v-if="showCategoryManager"
+      @close="showCategoryManager = false"
+    />
+
+    <!-- FAB Buttons -->
+    <div class="fab-container">
+      <button class="fab-btn categories-fab" @click="showCategoryManager = true" title="Gestionar Categorias">
+        📁
+      </button>
+      <button class="fab-btn settings-fab" @click="showSettings = true" title="Settings">
+        ⚙️
+      </button>
+    </div>
   </div>
 </template>
 
@@ -322,23 +335,33 @@ const handleAssignPhotos = async (assignments) => {
   padding: 30px 40px;
 }
 
-.settings-fab {
+.fab-container {
   position: fixed;
   bottom: 30px;
   right: 30px;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #d4af37 0%, #c9a227 100%);
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
-  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   z-index: 100;
+}
+
+.fab-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.settings-fab {
+  background: linear-gradient(135deg, #d4af37 0%, #c9a227 100%);
+  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
 }
 
 .settings-fab:hover {
@@ -346,17 +369,31 @@ const handleAssignPhotos = async (assignments) => {
   box-shadow: 0 8px 30px rgba(212, 175, 55, 0.6);
 }
 
+.categories-fab {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+}
+
+.categories-fab:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 30px rgba(102, 126, 234, 0.6);
+}
+
 @media (max-width: 600px) {
   .admin-container {
     padding: 20px 15px;
   }
 
-  .settings-fab {
+  .fab-container {
     bottom: 20px;
     right: 20px;
-    width: 50px;
-    height: 50px;
-    font-size: 1.3rem;
+    gap: 10px;
+  }
+
+  .fab-btn {
+    width: 48px;
+    height: 48px;
+    font-size: 1.2rem;
   }
 }
 </style>

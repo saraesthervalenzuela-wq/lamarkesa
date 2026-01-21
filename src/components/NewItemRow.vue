@@ -60,6 +60,12 @@ const karatOptions = {
     { value: '10k', label: '10k' },
     { value: '14k', label: '14k' },
     { value: '18k', label: '18k' }
+  ],
+  rhodium_plating: [
+    { value: '', label: 'Quilate' },
+    { value: '10k', label: '10k' },
+    { value: '14k', label: '14k' },
+    { value: '18k', label: '18k' }
   ]
 }
 
@@ -94,7 +100,7 @@ const stoneTypes = [
 
 // Computed properties for showing/hiding fields
 const showKarat = computed(() => {
-  return material.value === 'solid_gold' || material.value === 'hollow' || material.value === 'vermeil'
+  return material.value === 'solid_gold' || material.value === 'hollow' || material.value === 'vermeil' || material.value === 'rhodium_plating'
 })
 
 const showGoldColor = computed(() => {
