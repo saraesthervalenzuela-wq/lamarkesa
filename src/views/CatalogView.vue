@@ -49,10 +49,11 @@ const categories = [
 const materials = [
   { value: '', label: 'Todos los materiales' },
   { value: 'solid_gold', label: 'Solid Gold' },
-  { value: 'hollow', label: 'Hollow' },
+  { value: 'hollow', label: 'Hollow Gold' },
   { value: 'vermeil', label: 'Vermeil' },
-  { value: 'sterling_silver', label: 'Sterling Silver' },
-  { value: 'lab_grown', label: 'Lab Grown' }
+  { value: 'sterling_silver', label: '925 Sterling Silver' },
+  { value: 'lab_grown', label: 'Lab Grown' },
+  { value: 'rhodium_plating', label: 'Rhodium Plating' }
 ]
 
 const getCategoryLabel = (category) => {

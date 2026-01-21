@@ -15,6 +15,7 @@ const category = ref('rings')
 const material = ref('')
 const karat = ref('')
 const goldColor = ref('')
+const stoneType = ref('')
 const specialCollection = ref('')
 const size = ref('')
 const price = ref('')
@@ -34,10 +35,11 @@ const categories = [
 const materials = [
   { value: '', label: 'Sin material' },
   { value: 'solid_gold', label: 'Solid Gold' },
-  { value: 'hollow', label: 'Hollow' },
+  { value: 'hollow', label: 'Hollow Gold' },
   { value: 'vermeil', label: 'Vermeil' },
-  { value: 'sterling_silver', label: 'Sterling Silver' },
-  { value: 'lab_grown', label: 'Lab Grown' }
+  { value: 'sterling_silver', label: '925 Sterling Silver' },
+  { value: 'lab_grown', label: 'Lab Grown' },
+  { value: 'rhodium_plating', label: 'Rhodium Plating' }
 ]
 
 // Karats based on material
@@ -74,7 +76,20 @@ const specialCollections = [
   { value: '', label: 'Sin colección' },
   { value: 'bridal_sets', label: 'Bridal Sets' },
   { value: 'engagement_rings', label: 'Engagement Rings' },
-  { value: 'wedding_band', label: 'Wedding Band' }
+  { value: 'wedding_band', label: 'Wedding Band' },
+  { value: 'religious', label: 'Religious' },
+  { value: 'letters', label: 'Letters' }
+]
+
+// Stone types (for vermeil)
+const stoneTypes = [
+  { value: '', label: 'Sin piedra' },
+  { value: 'cz', label: 'CZ' },
+  { value: 'ruby', label: 'Ruby' },
+  { value: 'emerald', label: 'Emerald' },
+  { value: 'sapphire', label: 'Sapphire' },
+  { value: 'amethyst', label: 'Amethyst' },
+  { value: 'other', label: 'Other' }
 ]
 
 // Computed properties for showing/hiding fields
@@ -84,6 +99,10 @@ const showKarat = computed(() => {
 
 const showGoldColor = computed(() => {
   return material.value === 'solid_gold'
+})
+
+const showStoneType = computed(() => {
+  return material.value === 'vermeil'
 })
 
 const availableKarats = computed(() => {
@@ -99,6 +118,7 @@ const addItem = () => {
     material: material.value,
     karat: karat.value,
     goldColor: goldColor.value,
+    stoneType: stoneType.value,
     specialCollection: specialCollection.value,
     size: size.value.trim(),
     price: parseFloat(price.value) || 0,
@@ -110,6 +130,7 @@ const addItem = () => {
   material.value = ''
   karat.value = ''
   goldColor.value = ''
+  stoneType.value = ''
   specialCollection.value = ''
   size.value = ''
   price.value = ''
@@ -157,6 +178,12 @@ const handleKeypress = (event) => {
     <select v-if="showGoldColor" class="grid-select" v-model="goldColor">
       <option v-for="gc in goldColors" :key="gc.value" :value="gc.value">
         {{ gc.label }}
+      </option>
+    </select>
+
+    <select v-if="showStoneType" class="grid-select" v-model="stoneType">
+      <option v-for="st in stoneTypes" :key="st.value" :value="st.value">
+        {{ st.label }}
       </option>
     </select>
 
@@ -226,7 +253,14 @@ const handleKeypress = (event) => {
         {{ gc.label }}
       </option>
     </select>
-    <div v-else class="placeholder-cell">-</div>
+    <div v-else-if="!showStoneType" class="placeholder-cell">-</div>
+
+    <!-- Stone Type (for Vermeil) -->
+    <select v-if="showStoneType" class="stone-select" v-model="stoneType">
+      <option v-for="st in stoneTypes" :key="st.value" :value="st.value">
+        {{ st.label }}
+      </option>
+    </select>
 
     <!-- Special Collection -->
     <select class="collection-select" v-model="specialCollection">
@@ -451,7 +485,8 @@ const handleKeypress = (event) => {
 
 .material-select,
 .karat-select,
-.color-select {
+.color-select,
+.stone-select {
   background: #fff;
   border: 1px solid #E8E8E8;
   padding: 8px 10px;
@@ -464,7 +499,8 @@ const handleKeypress = (event) => {
 
 .material-select:focus,
 .karat-select:focus,
-.color-select:focus {
+.color-select:focus,
+.stone-select:focus {
   outline: none;
   border-color: #B79848;
   box-shadow: 0 0 0 3px rgba(183, 152, 72, 0.1);
@@ -472,7 +508,8 @@ const handleKeypress = (event) => {
 
 .material-select option,
 .karat-select option,
-.color-select option {
+.color-select option,
+.stone-select option {
   background: #fff;
   color: #333;
 }

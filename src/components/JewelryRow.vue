@@ -28,10 +28,11 @@ const categories = [
 const materials = [
   { value: '', label: 'Sin material' },
   { value: 'solid_gold', label: 'Solid Gold' },
-  { value: 'hollow', label: 'Hollow' },
+  { value: 'hollow', label: 'Hollow Gold' },
   { value: 'vermeil', label: 'Vermeil' },
-  { value: 'sterling_silver', label: 'Sterling Silver' },
-  { value: 'lab_grown', label: 'Lab Grown' }
+  { value: 'sterling_silver', label: '925 Sterling Silver' },
+  { value: 'lab_grown', label: 'Lab Grown' },
+  { value: 'rhodium_plating', label: 'Rhodium Plating' }
 ]
 
 // Karats based on material
@@ -68,7 +69,20 @@ const specialCollections = [
   { value: '', label: 'Sin colección' },
   { value: 'bridal_sets', label: 'Bridal Sets' },
   { value: 'engagement_rings', label: 'Engagement Rings' },
-  { value: 'wedding_band', label: 'Wedding Band' }
+  { value: 'wedding_band', label: 'Wedding Band' },
+  { value: 'religious', label: 'Religious' },
+  { value: 'letters', label: 'Letters' }
+]
+
+// Stone types (for vermeil)
+const stoneTypes = [
+  { value: '', label: 'Sin piedra' },
+  { value: 'cz', label: 'CZ' },
+  { value: 'ruby', label: 'Ruby' },
+  { value: 'emerald', label: 'Emerald' },
+  { value: 'sapphire', label: 'Sapphire' },
+  { value: 'amethyst', label: 'Amethyst' },
+  { value: 'other', label: 'Other' }
 ]
 
 // Computed properties for showing/hiding fields
@@ -79,6 +93,10 @@ const showKarat = computed(() => {
 
 const showGoldColor = computed(() => {
   return props.item.material === 'solid_gold'
+})
+
+const showStoneType = computed(() => {
+  return props.item.material === 'vermeil'
 })
 
 const availableKarats = computed(() => {
@@ -192,6 +210,17 @@ const confirmDelete = () => {
     >
       <option v-for="gc in goldColors" :key="gc.value" :value="gc.value">
         {{ gc.label }}
+      </option>
+    </select>
+    <!-- Stone Type (for Vermeil) -->
+    <select
+      v-else-if="showStoneType"
+      class="stone-select"
+      :value="item.stoneType || ''"
+      @change="emit('update', 'stoneType', $event.target.value)"
+    >
+      <option v-for="st in stoneTypes" :key="st.value" :value="st.value">
+        {{ st.label }}
       </option>
     </select>
     <div v-else class="placeholder-cell">-</div>
@@ -483,7 +512,8 @@ const confirmDelete = () => {
 
 .material-select,
 .karat-select,
-.color-select {
+.color-select,
+.stone-select {
   background: transparent;
   border: 1px solid transparent;
   padding: 8px 10px;
@@ -496,14 +526,16 @@ const confirmDelete = () => {
 
 .material-select:hover,
 .karat-select:hover,
-.color-select:hover {
+.color-select:hover,
+.stone-select:hover {
   background: #FAFAFA;
   border-color: #E8E8E8;
 }
 
 .material-select:focus,
 .karat-select:focus,
-.color-select:focus {
+.color-select:focus,
+.stone-select:focus {
   outline: none;
   background: #fff;
   border-color: #B79848;
@@ -512,7 +544,8 @@ const confirmDelete = () => {
 
 .material-select option,
 .karat-select option,
-.color-select option {
+.color-select option,
+.stone-select option {
   background: #fff;
   color: #333;
 }
