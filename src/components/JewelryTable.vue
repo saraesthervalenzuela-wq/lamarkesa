@@ -1,9 +1,10 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import JewelryRow from './JewelryRow.vue'
 import NewItemRow from './NewItemRow.vue'
+import ImageCarousel from './ImageCarousel.vue'
 
-defineProps({
+const props = defineProps({
   items: {
     type: Array,
     required: true
@@ -14,7 +15,18 @@ defineProps({
   }
 })
 
-const emit = defineEmits(['add', 'update', 'delete', 'upload-image'])
+const emit = defineEmits(['add', 'update', 'delete', 'add-images', 'delete-image'])
+
+// Helper para obtener imágenes de un item (compatibilidad)
+const getItemImages = (item) => {
+  if (item.images && item.images.length > 0) {
+    return item.images
+  }
+  if (item.image) {
+    return [item.image]
+  }
+  return []
+}
 
 const viewMode = ref('list') // 'list' or 'grid'
 
@@ -146,8 +158,9 @@ const getSpecialCollectionLabel = (collection) => {
           :key="item.id"
           :item="item"
           @update="(field, value) => emit('update', item.id, field, value)"
-          @delete="emit('delete', item.id, item.image)"
-          @upload-image="(file) => emit('upload-image', item.id, file)"
+          @delete="emit('delete', item.id, getItemImages(item))"
+          @add-images="(files) => emit('add-images', item.id, files)"
+          @delete-image="(index) => emit('delete-image', item.id, index)"
         />
       </div>
 
@@ -177,19 +190,17 @@ const getSpecialCollectionLabel = (collection) => {
           :key="item.id"
           class="grid-card"
         >
-          <div class="grid-image">
-            <img v-if="item.image" :src="item.image" :alt="item.name" />
-            <div v-else class="grid-no-image">💎</div>
+          <div class="grid-image-wrapper">
+            <ImageCarousel
+              :images="getItemImages(item)"
+              :item-name="item.name"
+              :item-sku="item.sku"
+              :item-price="item.price"
+              size="large"
+              @add-images="(files) => emit('add-images', item.id, files)"
+              @delete-image="(index) => emit('delete-image', item.id, index)"
+            />
             <div class="grid-category">{{ getCategoryLabel(item.category) }}</div>
-            <label class="grid-change-photo">
-              <input
-                type="file"
-                accept="image/*"
-                @change="(e) => e.target.files[0] && emit('upload-image', item.id, e.target.files[0])"
-                hidden
-              />
-              📷
-            </label>
           </div>
 
           <div class="grid-info">
@@ -245,7 +256,7 @@ const getSpecialCollectionLabel = (collection) => {
               </div>
               <button
                 class="grid-delete-btn"
-                @click="() => { if (confirm('¿Eliminar este producto?')) emit('delete', item.id, item.image) }"
+                @click="() => { if (confirm('¿Eliminar este producto?')) emit('delete', item.id, getItemImages(item)) }"
                 title="Eliminar"
               >
                 🗑️
@@ -393,28 +404,9 @@ const getSpecialCollectionLabel = (collection) => {
   box-shadow: 0 15px 40px rgba(183, 152, 72, 0.12);
 }
 
-.grid-image {
+.grid-image-wrapper {
   position: relative;
   width: 100%;
-  height: 250px;
-  background: #F9F9F9;
-  overflow: hidden;
-}
-
-.grid-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.grid-no-image {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 4rem;
-  color: #ddd;
 }
 
 .grid-category {
@@ -429,33 +421,8 @@ const getSpecialCollectionLabel = (collection) => {
   font-weight: 500;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-}
-
-.grid-change-photo {
-  position: absolute;
-  bottom: 12px;
-  right: 12px;
-  width: 40px;
-  height: 40px;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 1.1rem;
-  opacity: 0;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
-}
-
-.grid-image:hover .grid-change-photo {
-  opacity: 1;
-}
-
-.grid-change-photo:hover {
-  background: #B79848;
-  transform: scale(1.1);
+  z-index: 5;
+  pointer-events: none;
 }
 
 .grid-info {
@@ -765,10 +732,6 @@ const getSpecialCollectionLabel = (collection) => {
   .grid-container {
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 15px;
-  }
-
-  .grid-image {
-    height: 180px;
   }
 
   .grid-info {

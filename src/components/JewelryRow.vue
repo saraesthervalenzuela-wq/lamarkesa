@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
+import ImageCarousel from './ImageCarousel.vue'
 
 const props = defineProps({
   item: {
@@ -8,10 +9,18 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update', 'delete', 'upload-image'])
+const emit = defineEmits(['update', 'delete', 'add-images', 'delete-image'])
 
-const fileInput = ref(null)
-const showLightbox = ref(false)
+// Computed para obtener las imágenes (compatibilidad con campo antiguo 'image')
+const itemImages = computed(() => {
+  if (props.item.images && props.item.images.length > 0) {
+    return props.item.images
+  }
+  if (props.item.image) {
+    return [props.item.image]
+  }
+  return []
+})
 
 const categories = [
   { value: 'rings', label: 'Rings' },
@@ -109,26 +118,12 @@ const availableKarats = computed(() => {
   return karatOptions[props.item.material] || []
 })
 
-const handleImageClick = () => {
-  // If image exists, show lightbox; otherwise open file picker
-  if (props.item.image) {
-    showLightbox.value = true
-  } else {
-    fileInput.value?.click()
-  }
+const handleAddImages = (files) => {
+  emit('add-images', files)
 }
 
-const openFilePicker = (event) => {
-  event.stopPropagation()
-  fileInput.value?.click()
-}
-
-const handleFileChange = (event) => {
-  const file = event.target.files[0]
-  if (file) {
-    emit('upload-image', file)
-  }
-  event.target.value = ''
+const handleDeleteImage = (index) => {
+  emit('delete-image', index)
 }
 
 const confirmDelete = () => {
@@ -140,30 +135,16 @@ const confirmDelete = () => {
 
 <template>
   <div class="table-row">
-    <div class="row-image" @click="handleImageClick">
-      <img v-if="item.image" :src="item.image" :alt="item.name">
-      <span v-else class="row-image-placeholder">💎</span>
-      <button v-if="item.image" class="change-photo-btn" @click="openFilePicker" title="Cambiar foto">📷</button>
-      <input
-        ref="fileInput"
-        type="file"
-        accept="image/*"
-        class="hidden"
-        @change="handleFileChange"
-      >
-    </div>
-
-    <!-- Lightbox -->
-    <div v-if="showLightbox" class="lightbox-overlay" @click="showLightbox = false">
-      <div class="lightbox-content" @click.stop>
-        <button class="lightbox-close" @click="showLightbox = false">&times;</button>
-        <img :src="item.image" :alt="item.name" class="lightbox-image">
-        <div class="lightbox-info">
-          <h3>{{ item.name }}</h3>
-          <p v-if="item.sku">SKU: {{ item.sku }}</p>
-          <p class="lightbox-price">${{ item.price?.toFixed(2) }}</p>
-        </div>
-      </div>
+    <div class="row-image-container">
+      <ImageCarousel
+        :images="itemImages"
+        :item-name="item.name"
+        :item-sku="item.sku"
+        :item-price="item.price"
+        size="normal"
+        @add-images="handleAddImages"
+        @delete-image="handleDeleteImage"
+      />
     </div>
 
     <input
@@ -268,10 +249,6 @@ const confirmDelete = () => {
 </template>
 
 <style scoped>
-.hidden {
-  display: none;
-}
-
 .table-row {
   display: grid;
   grid-template-columns: 120px minmax(180px, 1.5fr) 120px 130px 80px 110px 130px 70px 90px 90px;
@@ -286,137 +263,10 @@ const confirmDelete = () => {
   background: #FDFCFA;
 }
 
-.row-image {
-  width: 110px;
-  height: 110px;
-  border-radius: 10px;
-  background: #F9F9F9;
+.row-image-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  cursor: pointer;
-  position: relative;
-  border: 1px solid #ECECEC;
-}
-
-.row-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.row-image-placeholder {
-  font-size: 1.5rem;
-  color: #ccc;
-}
-
-.row-image:hover::after {
-  content: '🔍';
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  pointer-events: none;
-}
-
-.change-photo-btn {
-  position: absolute;
-  bottom: 8px;
-  right: 8px;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: none;
-  background: #B79848;
-  cursor: pointer;
-  font-size: 0.9rem;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-  transition: transform 0.2s;
-}
-
-.row-image:hover .change-photo-btn {
-  display: flex;
-}
-
-.change-photo-btn:hover {
-  transform: scale(1.1);
-  background: #A08640;
-}
-
-/* Lightbox */
-.lightbox-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.85);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 20px;
-}
-
-.lightbox-content {
-  position: relative;
-  max-width: 90vw;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.lightbox-close {
-  position: absolute;
-  top: -40px;
-  right: -10px;
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: 2.5rem;
-  cursor: pointer;
-  transition: color 0.2s;
-  z-index: 1001;
-}
-
-.lightbox-close:hover {
-  color: #B79848;
-}
-
-.lightbox-image {
-  max-width: 100%;
-  max-height: 75vh;
-  object-fit: contain;
-  border-radius: 12px;
-  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
-}
-
-.lightbox-info {
-  margin-top: 20px;
-  text-align: center;
-  color: #fff;
-}
-
-.lightbox-info h3 {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.6rem;
-  margin-bottom: 8px;
-}
-
-.lightbox-info p {
-  color: rgba(255, 255, 255, 0.7);
-  margin: 4px 0;
-}
-
-.lightbox-price {
-  color: #B79848 !important;
-  font-size: 1.3rem;
-  font-weight: 600;
 }
 
 .editable-field {
@@ -609,10 +459,6 @@ const confirmDelete = () => {
   .table-row {
     grid-template-columns: 100px 1fr 100px 80px;
   }
-  .row-image {
-    width: 90px;
-    height: 90px;
-  }
   .table-row > *:nth-child(4),
   .table-row > *:nth-child(5) {
     display: none;
@@ -624,10 +470,6 @@ const confirmDelete = () => {
     grid-template-columns: 75px 1fr 90px 60px;
     padding: 10px 12px;
     gap: 8px;
-  }
-  .row-image {
-    width: 70px;
-    height: 70px;
   }
 }
 </style>

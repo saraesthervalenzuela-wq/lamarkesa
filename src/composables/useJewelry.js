@@ -123,22 +123,32 @@ export function useJewelry() {
     }
   }
 
+  // Helper para eliminar una imagen de Firebase Storage
+  const deleteImageFromStorage = async (imageUrl) => {
+    if (imageUrl && imageUrl.includes('firebase')) {
+      try {
+        const url = new URL(imageUrl)
+        const pathMatch = url.pathname.match(/\/o\/(.+)\?/)
+        if (pathMatch) {
+          const path = decodeURIComponent(pathMatch[1])
+          const imageRef = storageRef(storage, path)
+          await deleteObject(imageRef)
+        }
+      } catch (e) {
+        console.log('Image not found or already deleted:', e.message)
+      }
+    }
+  }
+
   // Eliminar joya
-  const deleteJewelry = async (id, imageUrl) => {
+  const deleteJewelry = async (id, images) => {
     try {
-      // Eliminar imagen si existe
-      if (imageUrl && imageUrl.includes('firebase')) {
-        try {
-          // Extraer el path de la URL de Firebase Storage
-          const url = new URL(imageUrl)
-          const pathMatch = url.pathname.match(/\/o\/(.+)\?/)
-          if (pathMatch) {
-            const path = decodeURIComponent(pathMatch[1])
-            const imageRef = storageRef(storage, path)
-            await deleteObject(imageRef)
-          }
-        } catch (e) {
-          console.log('Image not found or already deleted:', e.message)
+      // Eliminar todas las imágenes si existen
+      if (images) {
+        // Soporta tanto array como string individual (compatibilidad)
+        const imageArray = Array.isArray(images) ? images : [images]
+        for (const imageUrl of imageArray) {
+          await deleteImageFromStorage(imageUrl)
         }
       }
       await deleteDoc(doc(db, 'jewelry', id))
@@ -151,7 +161,10 @@ export function useJewelry() {
   // Subir imagen
   const uploadImage = async (file, jewelryId) => {
     try {
-      const fileRef = storageRef(storage, `jewelry/${jewelryId}/${file.name}`)
+      // Agregar timestamp para evitar colisiones de nombre
+      const timestamp = Date.now()
+      const fileName = `${timestamp}-${file.name}`
+      const fileRef = storageRef(storage, `jewelry/${jewelryId}/${fileName}`)
       await uploadBytes(fileRef, file)
       const url = await getDownloadURL(fileRef)
       return url
@@ -161,10 +174,68 @@ export function useJewelry() {
     }
   }
 
+  // Subir múltiples imágenes
+  const uploadMultipleImages = async (files, jewelryId) => {
+    try {
+      const urls = []
+      for (const file of files) {
+        const url = await uploadImage(file, jewelryId)
+        urls.push(url)
+      }
+      return urls
+    } catch (error) {
+      console.error('Error uploading multiple images:', error)
+      throw error
+    }
+  }
+
+  // Agregar imágenes a un producto existente
+  const addImagesToJewelry = async (id, files, currentImages = []) => {
+    try {
+      const newUrls = await uploadMultipleImages(files, id)
+      const updatedImages = [...currentImages, ...newUrls]
+      await updateJewelry(id, { images: updatedImages })
+      return updatedImages
+    } catch (error) {
+      console.error('Error adding images:', error)
+      throw error
+    }
+  }
+
+  // Eliminar una imagen específica de un producto
+  const removeImageFromJewelry = async (id, imageIndex, currentImages) => {
+    try {
+      const imageUrl = currentImages[imageIndex]
+      await deleteImageFromStorage(imageUrl)
+      const updatedImages = currentImages.filter((_, i) => i !== imageIndex)
+      await updateJewelry(id, { images: updatedImages })
+      return updatedImages
+    } catch (error) {
+      console.error('Error removing image:', error)
+      throw error
+    }
+  }
+
+  // Helper para obtener imágenes (compatibilidad con campo 'image' antiguo)
+  const getImages = (item) => {
+    if (item.images && item.images.length > 0) {
+      return item.images
+    }
+    // Compatibilidad con campo 'image' singular
+    if (item.image) {
+      return [item.image]
+    }
+    return []
+  }
+
   // Limpiar todo
   const clearAll = async () => {
     try {
-      const promises = jewelry.value.map(item => deleteJewelry(item.id, item.image))
+      const promises = jewelry.value.map(item => {
+        // Usar images array si existe, de lo contrario usar image
+        const images = item.images || (item.image ? [item.image] : [])
+        return deleteJewelry(item.id, images)
+      })
       await Promise.all(promises)
     } catch (error) {
       console.error('Error clearing all:', error)
@@ -300,6 +371,10 @@ export function useJewelry() {
     updateJewelry,
     deleteJewelry,
     uploadImage,
+    uploadMultipleImages,
+    addImagesToJewelry,
+    removeImageFromJewelry,
+    getImages,
     clearAll,
     exportToCSV,
     exportToJSON,

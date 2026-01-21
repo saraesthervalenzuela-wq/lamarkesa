@@ -29,6 +29,9 @@ const {
   updateJewelry,
   deleteJewelry,
   uploadImage,
+  addImagesToJewelry,
+  removeImageFromJewelry,
+  getImages,
   clearAll,
   exportToCSV,
   exportToJSON,
@@ -56,20 +59,34 @@ const handleUpdate = async (id, field, value) => {
   }
 }
 
-const handleDelete = async (id, imageUrl) => {
+const handleDelete = async (id, images) => {
   try {
-    await deleteJewelry(id, imageUrl)
+    await deleteJewelry(id, images)
   } catch (error) {
     alert('Error deleting item: ' + error.message)
   }
 }
 
-const handleUploadImage = async (id, file) => {
+// Agregar múltiples imágenes a un producto
+const handleAddImages = async (id, files) => {
   try {
-    const url = await uploadImage(file, id)
-    await updateJewelry(id, { image: url })
+    // Obtener imágenes actuales del producto
+    const item = filteredJewelry.value.find(j => j.id === id)
+    const currentImages = getImages(item)
+    await addImagesToJewelry(id, files, currentImages)
   } catch (error) {
-    alert('Error uploading image: ' + error.message)
+    alert('Error uploading images: ' + error.message)
+  }
+}
+
+// Eliminar una imagen específica de un producto
+const handleDeleteImage = async (id, imageIndex) => {
+  try {
+    const item = filteredJewelry.value.find(j => j.id === id)
+    const currentImages = getImages(item)
+    await removeImageFromJewelry(id, imageIndex, currentImages)
+  } catch (error) {
+    alert('Error deleting image: ' + error.message)
   }
 }
 
@@ -205,14 +222,15 @@ const handleImageAnalyzerImport = async (items) => {
     let imported = 0
     for (const item of items) {
       // Si tiene imagen base64, subirla a Firebase Storage
-      let imageUrl = ''
+      let images = []
       if (item.image && item.image.startsWith('data:')) {
         // Convertir base64 a blob y subir
         const response = await fetch(item.image)
         const blob = await response.blob()
         const file = new File([blob], `jewelry-${Date.now()}.jpg`, { type: 'image/jpeg' })
         const docId = Date.now().toString()
-        imageUrl = await uploadImage(file, docId)
+        const imageUrl = await uploadImage(file, docId)
+        images = [imageUrl]
       }
 
       await addJewelry({
@@ -220,7 +238,7 @@ const handleImageAnalyzerImport = async (items) => {
         category: item.category || 'other',
         price: parseFloat(item.price) || 0,
         sku: item.sku || '',
-        image: imageUrl
+        images: images
       })
       imported++
     }
@@ -239,10 +257,13 @@ const handleAssignPhotos = async (assignments) => {
       const response = await fetch(photoDataUrl)
       const blob = await response.blob()
       const file = new File([blob], `jewelry-${productId}-${Date.now()}.jpg`, { type: 'image/jpeg' })
-      const imageUrl = await uploadImage(file, productId)
 
-      // Update product with image URL
-      await updateJewelry(productId, { image: imageUrl })
+      // Obtener imágenes actuales del producto
+      const item = filteredJewelry.value.find(j => j.id === productId)
+      const currentImages = getImages(item)
+
+      // Agregar la nueva imagen al array existente
+      await addImagesToJewelry(productId, [file], currentImages)
       assigned++
     }
     alert(`Assigned ${assigned} photos to products!`)
@@ -279,7 +300,8 @@ const handleAssignPhotos = async (assignments) => {
       @add="handleAdd"
       @update="handleUpdate"
       @delete="handleDelete"
-      @upload-image="handleUploadImage"
+      @add-images="handleAddImages"
+      @delete-image="handleDeleteImage"
     />
 
     <!-- AI Import Modal -->
