@@ -35,7 +35,7 @@ const categories = [
 
 // Materials
 const materials = [
-  { value: '', label: 'Sin material' },
+  { value: '', label: 'No material' },
   { value: 'solid_gold', label: 'Solid Gold' },
   { value: 'hollow', label: 'Hollow Gold' },
   { value: 'vermeil', label: 'Vermeil' },
@@ -47,24 +47,24 @@ const materials = [
 // Karats based on material
 const karatOptions = {
   solid_gold: [
-    { value: '', label: 'Sin quilate' },
+    { value: '', label: 'No karat' },
     { value: '10k', label: '10k' },
     { value: '14k', label: '14k' }
   ],
   hollow: [
-    { value: '', label: 'Sin quilate' },
+    { value: '', label: 'No karat' },
     { value: '10k', label: '10k' },
     { value: '14k', label: '14k' },
     { value: '18k', label: '18k' }
   ],
   vermeil: [
-    { value: '', label: 'Sin quilate' },
+    { value: '', label: 'No karat' },
     { value: '10k', label: '10k' },
     { value: '14k', label: '14k' },
     { value: '18k', label: '18k' }
   ],
   rhodium_plating: [
-    { value: '', label: 'Sin quilate' },
+    { value: '', label: 'No karat' },
     { value: '10k', label: '10k' },
     { value: '14k', label: '14k' },
     { value: '18k', label: '18k' }
@@ -73,7 +73,7 @@ const karatOptions = {
 
 // Gold colors (only for solid_gold)
 const goldColors = [
-  { value: '', label: 'Sin color' },
+  { value: '', label: 'No color' },
   { value: 'yellow', label: 'Yellow Gold' },
   { value: 'white', label: 'White Gold' },
   { value: 'tri_tone', label: 'Tri-tone Gold' }
@@ -81,7 +81,7 @@ const goldColors = [
 
 // Special collections
 const specialCollections = [
-  { value: '', label: 'Sin colección' },
+  { value: '', label: 'No collection' },
   { value: 'bridal_sets', label: 'Bridal Sets' },
   { value: 'engagement_rings', label: 'Engagement Rings' },
   { value: 'wedding_band', label: 'Wedding Band' },
@@ -91,7 +91,7 @@ const specialCollections = [
 
 // Stone types (for vermeil)
 const stoneTypes = [
-  { value: '', label: 'Sin piedra' },
+  { value: '', label: 'No stone' },
   { value: 'cz', label: 'CZ' },
   { value: 'ruby', label: 'Ruby' },
   { value: 'emerald', label: 'Emerald' },
@@ -229,7 +229,7 @@ const confirmDelete = () => {
       type="text"
       class="editable-field size-field"
       :value="item.size || ''"
-      placeholder="Talla"
+      placeholder="Size"
       @change="emit('update', 'size', $event.target.value)"
     >
 
@@ -252,9 +252,9 @@ const confirmDelete = () => {
 <style scoped>
 .table-row {
   display: grid;
-  grid-template-columns: 115px minmax(140px, 1fr) 100px 110px 70px 100px 110px 60px 80px 90px;
-  gap: 10px;
-  padding: 15px 20px;
+  grid-template-columns: 100px minmax(120px, 1fr) 90px 100px 60px 90px 100px 50px 70px 80px;
+  gap: 8px;
+  padding: 14px 15px;
   border-bottom: 1px solid #F0F0F0;
   align-items: center;
   transition: background 0.2s;

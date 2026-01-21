@@ -144,15 +144,15 @@ defineExpose({ handleKeydown })
       />
       <div v-else class="carousel-placeholder">
         <span>💎</span>
-        <small>Click para agregar fotos</small>
+        <small>Click to add photos</small>
       </div>
 
       <!-- Navigation Arrows (only if multiple images) -->
       <template v-if="totalImages > 1">
-        <button class="carousel-arrow carousel-prev" @click="goToPrev" title="Anterior">
+        <button class="carousel-arrow carousel-prev" @click="goToPrev" title="Previous">
           ‹
         </button>
-        <button class="carousel-arrow carousel-next" @click="goToNext" title="Siguiente">
+        <button class="carousel-arrow carousel-next" @click="goToNext" title="Next">
           ›
         </button>
       </template>
@@ -164,14 +164,14 @@ defineExpose({ handleKeydown })
 
       <!-- Action Buttons -->
       <div class="carousel-actions">
-        <button class="carousel-btn add-btn" @click="openFilePicker" title="Agregar fotos">
+        <button class="carousel-btn add-btn" @click="openFilePicker" title="Add photos">
           ➕
         </button>
         <button
           v-if="hasImages"
           class="carousel-btn delete-btn"
           @click="handleDeleteImage(currentIndex, $event)"
-          title="Eliminar esta foto"
+          title="Delete this photo"
         >
           🗑️
         </button>
@@ -313,8 +313,8 @@ defineExpose({ handleKeydown })
 }
 
 .size-normal {
-  width: 110px;
-  height: 110px;
+  width: 90px;
+  height: 90px;
 }
 
 .size-large {

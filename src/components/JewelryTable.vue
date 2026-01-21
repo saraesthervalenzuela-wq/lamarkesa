@@ -31,18 +31,18 @@ const getItemImages = (item) => {
 const viewMode = ref('list') // 'list' or 'grid'
 
 const categories = [
-  { value: 'rings', label: 'Anillos' },
-  { value: 'necklaces', label: 'Collares' },
-  { value: 'bracelets', label: 'Pulseras' },
-  { value: 'earrings', label: 'Aretes' },
+  { value: 'rings', label: 'Rings' },
+  { value: 'necklaces', label: 'Necklaces' },
+  { value: 'bracelets', label: 'Bracelets' },
+  { value: 'earrings', label: 'Earrings' },
   { value: 'chains', label: 'Chains' },
   { value: 'pendants', label: 'Pendants' },
-  { value: 'watches', label: 'Relojes' },
-  { value: 'other', label: 'Otros' }
+  { value: 'watches', label: 'Watches' },
+  { value: 'other', label: 'Other' }
 ]
 
 const materials = [
-  { value: '', label: 'Sin material' },
+  { value: '', label: 'No material' },
   { value: 'solid_gold', label: 'Solid Gold' },
   { value: 'hollow', label: 'Hollow Gold' },
   { value: 'vermeil', label: 'Vermeil' },
@@ -59,7 +59,7 @@ const goldColors = [
 ]
 
 const specialCollections = [
-  { value: '', label: 'Sin colección' },
+  { value: '', label: 'No collection' },
   { value: 'bridal_sets', label: 'Bridal Sets' },
   { value: 'engagement_rings', label: 'Engagement Rings' },
   { value: 'wedding_band', label: 'Wedding Band' },
@@ -69,7 +69,7 @@ const specialCollections = [
 
 const getCategoryLabel = (category) => {
   const cat = categories.find(c => c.value === category)
-  return cat ? cat.label : 'Otro'
+  return cat ? cat.label : 'Other'
 }
 
 const getMaterialLabel = (material) => {
@@ -208,7 +208,7 @@ const getSpecialCollectionLabel = (collection) => {
               type="text"
               :value="item.name"
               class="grid-name-input"
-              placeholder="Nombre"
+              placeholder="Name"
               @blur="(e) => e.target.value !== item.name && emit('update', item.id, 'name', e.target.value)"
             />
 
@@ -256,8 +256,8 @@ const getSpecialCollectionLabel = (collection) => {
               </div>
               <button
                 class="grid-delete-btn"
-                @click="() => { if (confirm('¿Eliminar este producto?')) emit('delete', item.id, getItemImages(item)) }"
-                title="Eliminar"
+                @click="() => { if (confirm('Delete this product?')) emit('delete', item.id, getItemImages(item)) }"
+                title="Delete"
               >
                 🗑️
               </button>
@@ -330,9 +330,9 @@ const getSpecialCollectionLabel = (collection) => {
 
 .table-header {
   display: grid;
-  grid-template-columns: 115px minmax(140px, 1fr) 100px 110px 70px 100px 110px 60px 80px 90px;
-  gap: 10px;
-  padding: 18px 20px;
+  grid-template-columns: 100px minmax(120px, 1fr) 90px 100px 60px 90px 100px 50px 70px 80px;
+  gap: 8px;
+  padding: 16px 15px;
   background: linear-gradient(135deg, #FDFAF6 0%, #FAF7F2 100%);
   border-bottom: 1px solid rgba(183, 152, 72, 0.12);
   font-size: 0.7rem;
