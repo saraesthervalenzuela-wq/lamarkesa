@@ -103,8 +103,10 @@ const openFilePicker = (e) => {
 
 const handleFileChange = (event) => {
   const files = Array.from(event.target.files)
+  console.log('ImageCarousel handleFileChange:', files)
   if (files.length > 0) {
     emit('add-images', files)
+    console.log('Emitted add-images event')
   }
   event.target.value = ''
 }

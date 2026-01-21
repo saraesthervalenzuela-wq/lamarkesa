@@ -70,11 +70,19 @@ const handleDelete = async (id, images) => {
 // Agregar múltiples imágenes a un producto
 const handleAddImages = async (id, files) => {
   try {
+    console.log('handleAddImages called:', id, files)
     // Obtener imágenes actuales del producto
     const item = filteredJewelry.value.find(j => j.id === id)
-    const currentImages = getImages(item)
+    if (!item) {
+      console.error('Item not found:', id)
+      return
+    }
+    const currentImages = getImages(item) || []
+    console.log('Current images:', currentImages)
     await addImagesToJewelry(id, files, currentImages)
+    console.log('Images added successfully')
   } catch (error) {
+    console.error('Error in handleAddImages:', error)
     alert('Error uploading images: ' + error.message)
   }
 }
