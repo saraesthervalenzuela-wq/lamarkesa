@@ -21,19 +21,19 @@ const size = ref('')
 const price = ref('')
 
 const categories = [
-  { value: 'rings', label: 'Anillos' },
-  { value: 'necklaces', label: 'Collares' },
-  { value: 'earrings', label: 'Aretes' },
-  { value: 'bracelets', label: 'Pulseras' },
+  { value: 'rings', label: 'Rings' },
+  { value: 'necklaces', label: 'Necklaces' },
+  { value: 'earrings', label: 'Earrings' },
+  { value: 'bracelets', label: 'Bracelets' },
   { value: 'chains', label: 'Chains' },
   { value: 'pendants', label: 'Pendants' },
-  { value: 'watches', label: 'Relojes' },
-  { value: 'other', label: 'Otros' }
+  { value: 'watches', label: 'Watches' },
+  { value: 'other', label: 'Other' }
 ]
 
 // Materials
 const materials = [
-  { value: '', label: 'Sin material' },
+  { value: '', label: 'No material' },
   { value: 'solid_gold', label: 'Solid Gold' },
   { value: 'hollow', label: 'Hollow Gold' },
   { value: 'vermeil', label: 'Vermeil' },
@@ -45,24 +45,24 @@ const materials = [
 // Karats based on material
 const karatOptions = {
   solid_gold: [
-    { value: '', label: 'Quilate' },
+    { value: '', label: 'Karat' },
     { value: '10k', label: '10k' },
     { value: '14k', label: '14k' }
   ],
   hollow: [
-    { value: '', label: 'Quilate' },
+    { value: '', label: 'Karat' },
     { value: '10k', label: '10k' },
     { value: '14k', label: '14k' },
     { value: '18k', label: '18k' }
   ],
   vermeil: [
-    { value: '', label: 'Quilate' },
+    { value: '', label: 'Karat' },
     { value: '10k', label: '10k' },
     { value: '14k', label: '14k' },
     { value: '18k', label: '18k' }
   ],
   rhodium_plating: [
-    { value: '', label: 'Quilate' },
+    { value: '', label: 'Karat' },
     { value: '10k', label: '10k' },
     { value: '14k', label: '14k' },
     { value: '18k', label: '18k' }
@@ -79,7 +79,7 @@ const goldColors = [
 
 // Special collections
 const specialCollections = [
-  { value: '', label: 'Sin colección' },
+  { value: '', label: 'No collection' },
   { value: 'bridal_sets', label: 'Bridal Sets' },
   { value: 'engagement_rings', label: 'Engagement Rings' },
   { value: 'wedding_band', label: 'Wedding Band' },
@@ -89,7 +89,7 @@ const specialCollections = [
 
 // Stone types (for vermeil)
 const stoneTypes = [
-  { value: '', label: 'Sin piedra' },
+  { value: '', label: 'No stone' },
   { value: 'cz', label: 'CZ' },
   { value: 'ruby', label: 'Ruby' },
   { value: 'emerald', label: 'Emerald' },
@@ -153,13 +153,13 @@ const handleKeypress = (event) => {
   <!-- Grid Mode -->
   <div v-if="gridMode" class="grid-add-form">
     <div class="grid-add-icon">+</div>
-    <h4>Agregar Producto</h4>
+    <h4>Add Product</h4>
 
     <input
       type="text"
       class="grid-input"
       v-model="name"
-      placeholder="Nombre del producto..."
+      placeholder="Product name..."
       @keypress="handleKeypress"
     />
 
@@ -203,20 +203,20 @@ const handleKeypress = (event) => {
       type="text"
       class="grid-input"
       v-model="size"
-      placeholder="Talla (opcional)"
+      placeholder="Size (optional)"
     />
 
     <input
       type="number"
       class="grid-input grid-price"
       v-model="price"
-      placeholder="Precio"
+      placeholder="Price"
       step="0.01"
       @keypress="handleKeypress"
     />
 
     <button class="grid-add-btn" @click="addItem">
-      Agregar
+      Add
     </button>
   </div>
 
@@ -228,7 +228,7 @@ const handleKeypress = (event) => {
       type="text"
       class="editable-field name-field"
       v-model="name"
-      placeholder="Nombre del producto..."
+      placeholder="Product name..."
       @keypress="handleKeypress"
     >
 
@@ -280,7 +280,7 @@ const handleKeypress = (event) => {
       type="text"
       class="editable-field size-field"
       v-model="size"
-      placeholder="Talla"
+      placeholder="Size"
     >
 
     <input
@@ -292,7 +292,7 @@ const handleKeypress = (event) => {
       @keypress="handleKeypress"
     >
 
-    <button class="btn btn-primary btn-small" @click="addItem">Agregar</button>
+    <button class="btn btn-primary btn-small" @click="addItem">Add</button>
   </div>
 </template>
 

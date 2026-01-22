@@ -32,22 +32,22 @@ onMounted(() => {
   initializeListener()
 })
 
-// Categorías para el filtro
+// Categories for filter
 const categories = [
-  { value: '', label: 'Todas las categorías' },
-  { value: 'rings', label: 'Anillos' },
-  { value: 'necklaces', label: 'Collares' },
-  { value: 'bracelets', label: 'Pulseras' },
-  { value: 'earrings', label: 'Aretes' },
+  { value: '', label: 'All Categories' },
+  { value: 'rings', label: 'Rings' },
+  { value: 'necklaces', label: 'Necklaces' },
+  { value: 'bracelets', label: 'Bracelets' },
+  { value: 'earrings', label: 'Earrings' },
   { value: 'chains', label: 'Chains' },
   { value: 'pendants', label: 'Pendants' },
-  { value: 'watches', label: 'Relojes' },
-  { value: 'other', label: 'Otros' }
+  { value: 'watches', label: 'Watches' },
+  { value: 'other', label: 'Other' }
 ]
 
-// Materiales para el filtro
+// Materials for filter
 const materials = [
-  { value: '', label: 'Todos los materiales' },
+  { value: '', label: 'All Materials' },
   { value: 'solid_gold', label: 'Solid Gold' },
   { value: 'hollow', label: 'Hollow Gold' },
   { value: 'vermeil', label: 'Vermeil' },
@@ -58,7 +58,7 @@ const materials = [
 
 const getCategoryLabel = (category) => {
   const cat = categories.find(c => c.value === category)
-  return cat ? cat.label : 'Otro'
+  return cat ? cat.label : 'Other'
 }
 
 const getMaterialLabel = (material) => {
@@ -75,7 +75,7 @@ const getMaterialLabel = (material) => {
         <input
           v-model="searchQuery"
           type="text"
-          placeholder="Buscar productos..."
+          placeholder="Search products..."
           class="search-input"
         />
       </div>
@@ -98,11 +98,11 @@ const getMaterialLabel = (material) => {
 
       <div class="filter-group">
         <select v-model="sortBy" class="filter-select">
-          <option value="newest">Más recientes</option>
-          <option value="oldest">Más antiguos</option>
-          <option value="price-high">Precio: Mayor a Menor</option>
-          <option value="price-low">Precio: Menor a Mayor</option>
-          <option value="name">Nombre A-Z</option>
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="price-high">Price: High to Low</option>
+          <option value="price-low">Price: Low to High</option>
+          <option value="name">Name A-Z</option>
         </select>
       </div>
 
@@ -111,7 +111,7 @@ const getMaterialLabel = (material) => {
         <button
           :class="['toggle-btn', { active: viewMode === 'grid' }]"
           @click="viewMode = 'grid'"
-          title="Vista Grid"
+          title="Grid View"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="3" width="7" height="7"/>
@@ -123,7 +123,7 @@ const getMaterialLabel = (material) => {
         <button
           :class="['toggle-btn', { active: viewMode === 'list' }]"
           @click="viewMode = 'list'"
-          title="Vista Lista"
+          title="List View"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="8" y1="6" x2="21" y2="6"/>
@@ -140,7 +140,7 @@ const getMaterialLabel = (material) => {
     <!-- Loading -->
     <div v-if="loading" class="loading">
       <div class="spinner"></div>
-      <p>Cargando productos...</p>
+      <p>Loading products...</p>
     </div>
 
     <!-- Products Grid View -->
@@ -179,7 +179,7 @@ const getMaterialLabel = (material) => {
         </div>
 
         <div class="product-info">
-          <h3 class="product-name">{{ item.name || 'Sin nombre' }}</h3>
+          <h3 class="product-name">{{ item.name || 'Unnamed' }}</h3>
           <p v-if="item.sku" class="product-sku">SKU: {{ item.sku }}</p>
           <div class="product-footer">
             <span class="product-price">${{ item.price?.toFixed(2) || '0.00' }}</span>
@@ -210,7 +210,7 @@ const getMaterialLabel = (material) => {
 
         <div class="list-info">
           <div class="list-header">
-            <h3 class="list-name">{{ item.name || 'Sin nombre' }}</h3>
+            <h3 class="list-name">{{ item.name || 'Unnamed' }}</h3>
             <span class="list-category">{{ getCategoryLabel(item.category) }}</span>
           </div>
           <p v-if="item.sku" class="list-sku">SKU: {{ item.sku }}</p>
@@ -222,7 +222,7 @@ const getMaterialLabel = (material) => {
 
     <!-- Empty state -->
     <div v-else class="empty-state">
-      <p>No se encontraron productos</p>
+      <p>No products found</p>
     </div>
 
     <!-- Lightbox Modal -->
@@ -253,7 +253,7 @@ const getMaterialLabel = (material) => {
   display: flex;
   gap: 15px;
   flex-wrap: wrap;
-  max-width: 1400px;
+  max-width: 100%;
   margin: 0 auto 40px;
   padding: 0 20px;
   align-items: center;
@@ -356,9 +356,9 @@ const getMaterialLabel = (material) => {
 /* Products Grid */
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(8, 1fr);
   gap: 25px;
-  max-width: 1400px;
+  max-width: 100%;
   margin: 0 auto;
   padding: 0 20px;
 }
@@ -496,7 +496,7 @@ const getMaterialLabel = (material) => {
 
 /* Products List */
 .products-list {
-  max-width: 1400px;
+  max-width: 100%;
   margin: 0 auto;
   padding: 0 20px;
   display: flex;
@@ -674,7 +674,31 @@ const getMaterialLabel = (material) => {
   margin-top: 10px !important;
 }
 
-/* Responsive */
+/* Responsive Grid */
+@media (max-width: 1800px) {
+  .products-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+@media (max-width: 1400px) {
+  .products-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+@media (max-width: 1100px) {
+  .products-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .products-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
   .filters {
     gap: 10px;
@@ -696,7 +720,7 @@ const getMaterialLabel = (material) => {
   }
 
   .products-grid {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 15px;
   }
 

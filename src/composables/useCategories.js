@@ -86,7 +86,7 @@ export function useCategories() {
 
     // Check if already exists
     if (categories.value.some(c => c.value === value || c.label.toLowerCase() === label.toLowerCase())) {
-      throw new Error('Esta categoria ya existe')
+      throw new Error('This category already exists')
     }
 
     const newCategories = [...categories.value, { value, label }]
@@ -111,7 +111,7 @@ export function useCategories() {
   // Get categories with "all" option for filters
   const getCategoriesForFilter = () => {
     return [
-      { value: '', label: 'Todas las categorias' },
+      { value: '', label: 'All Categories' },
       ...categories.value
     ]
   }

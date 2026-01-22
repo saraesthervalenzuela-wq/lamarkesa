@@ -250,7 +250,7 @@ defineExpose({ handleKeydown })
             <h3>{{ itemName }}</h3>
             <p v-if="itemSku">SKU: {{ itemSku }}</p>
             <p class="lightbox-price">${{ itemPrice?.toFixed(2) }}</p>
-            <p class="lightbox-counter">{{ lightboxIndex + 1 }} de {{ totalImages }}</p>
+            <p class="lightbox-counter">{{ lightboxIndex + 1 }} of {{ totalImages }}</p>
           </div>
         </div>
       </div>

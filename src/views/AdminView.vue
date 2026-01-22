@@ -242,7 +242,7 @@ const handleImageAnalyzerImport = async (items) => {
       }
 
       await addJewelry({
-        name: item.name || 'Joya sin nombre',
+        name: item.name || 'Unnamed jewelry',
         category: item.category || 'other',
         price: parseFloat(item.price) || 0,
         sku: item.sku || '',

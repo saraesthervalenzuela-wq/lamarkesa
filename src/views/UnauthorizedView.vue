@@ -10,7 +10,7 @@ const handleLogin = async () => {
     await loginWithGoogle()
     router.push('/catalog')
   } catch (error) {
-    console.error('Error al iniciar sesión:', error)
+    console.error('Error signing in:', error)
   }
 }
 
@@ -28,22 +28,22 @@ const goToCatalog = () => {
   <div class="unauthorized-container">
     <div class="unauthorized-card">
       <div class="icon">🔒</div>
-      <h1>Acceso Restringido</h1>
-      <p v-if="!user">Necesitas iniciar sesión para acceder a esta sección.</p>
-      <p v-else>No tienes permisos para acceder a esta sección.</p>
+      <h1>Restricted Access</h1>
+      <p v-if="!user">You need to sign in to access this section.</p>
+      <p v-else>You don't have permission to access this section.</p>
 
       <div class="actions">
         <button v-if="!user" @click="handleLogin" class="btn btn-primary">
-          Iniciar sesión con Google
+          Sign in with Google
         </button>
         <template v-else>
-          <p class="user-info">Conectado como: {{ user.email }}</p>
+          <p class="user-info">Signed in as: {{ user.email }}</p>
           <button @click="handleLogout" class="btn btn-secondary">
-            Cerrar sesión
+            Sign Out
           </button>
         </template>
         <button @click="goToCatalog" class="btn btn-outline">
-          Ver Catálogo
+          View Catalog
         </button>
       </div>
     </div>

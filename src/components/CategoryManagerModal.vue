@@ -26,27 +26,27 @@ onMounted(async () => {
 
 const handleAdd = async () => {
   if (!newCategoryName.value.trim()) {
-    showStatus('Ingresa un nombre para la categoria', 'error')
+    showStatus('Enter a name for the category', 'error')
     return
   }
 
   try {
     await addCategory(newCategoryName.value.trim())
     newCategoryName.value = ''
-    showStatus('Categoria agregada', 'success')
+    showStatus('Category added', 'success')
   } catch (err) {
     showStatus(err.message, 'error')
   }
 }
 
 const handleDelete = async (value, label) => {
-  if (!confirm(`Eliminar la categoria "${label}"?`)) return
+  if (!confirm(`Delete category "${label}"?`)) return
 
   try {
     await deleteCategory(value)
-    showStatus('Categoria eliminada', 'success')
+    showStatus('Category deleted', 'success')
   } catch (err) {
-    showStatus('Error al eliminar: ' + err.message, 'error')
+    showStatus('Error deleting: ' + err.message, 'error')
   }
 }
 
@@ -62,7 +62,7 @@ const cancelEdit = () => {
 
 const saveEdit = async () => {
   if (!editValue.value.trim()) {
-    showStatus('El nombre no puede estar vacio', 'error')
+    showStatus('Name cannot be empty', 'error')
     return
   }
 
@@ -70,9 +70,9 @@ const saveEdit = async () => {
     await updateCategory(editingCategory.value, editValue.value.trim())
     editingCategory.value = null
     editValue.value = ''
-    showStatus('Categoria actualizada', 'success')
+    showStatus('Category updated', 'success')
   } catch (err) {
-    showStatus('Error al actualizar: ' + err.message, 'error')
+    showStatus('Error updating: ' + err.message, 'error')
   }
 }
 
@@ -96,19 +96,19 @@ const handleKeypress = (event) => {
   <div class="modal-overlay" @click.self="emit('close')">
     <div class="modal">
       <div class="modal-header">
-        <h2>Gestionar Categorias</h2>
+        <h2>Manage Categories</h2>
         <button class="modal-close" @click="emit('close')">&times;</button>
       </div>
 
       <div class="modal-body">
         <!-- Add New Category -->
         <div class="add-section">
-          <h3>Agregar Nueva Categoria</h3>
+          <h3>Add New Category</h3>
           <div class="add-form">
             <input
               type="text"
               v-model="newCategoryName"
-              placeholder="Nombre de la categoria..."
+              placeholder="Category name..."
               class="input-field"
               @keypress="handleKeypress"
             />
@@ -117,7 +117,7 @@ const handleKeypress = (event) => {
               @click="handleAdd"
               :disabled="loading || !newCategoryName.trim()"
             >
-              + Agregar
+              + Add
             </button>
           </div>
         </div>
@@ -133,11 +133,11 @@ const handleKeypress = (event) => {
 
         <!-- Categories List -->
         <div class="categories-section">
-          <h3>Categorias Existentes</h3>
+          <h3>Existing Categories</h3>
 
           <div v-if="loading" class="loading-state">
             <div class="spinner"></div>
-            <span>Cargando...</span>
+            <span>Loading...</span>
           </div>
 
           <div v-else class="categories-list">
@@ -156,14 +156,14 @@ const handleKeypress = (event) => {
                   <button
                     class="btn-icon btn-edit"
                     @click="startEdit(category)"
-                    title="Editar"
+                    title="Edit"
                   >
                     ✏️
                   </button>
                   <button
                     class="btn-icon btn-delete"
                     @click="handleDelete(category.value, category.label)"
-                    title="Eliminar"
+                    title="Delete"
                   >
                     🗑️
                   </button>
@@ -182,14 +182,14 @@ const handleKeypress = (event) => {
                   <button
                     class="btn-icon btn-save"
                     @click="saveEdit"
-                    title="Guardar"
+                    title="Save"
                   >
                     ✓
                   </button>
                   <button
                     class="btn-icon btn-cancel"
                     @click="cancelEdit"
-                    title="Cancelar"
+                    title="Cancel"
                   >
                     ✕
                   </button>
@@ -198,7 +198,7 @@ const handleKeypress = (event) => {
             </div>
 
             <div v-if="categories.length === 0" class="empty-state">
-              No hay categorias. Agrega una nueva.
+              No categories. Add a new one.
             </div>
           </div>
         </div>
@@ -206,7 +206,7 @@ const handleKeypress = (event) => {
 
       <div class="modal-footer">
         <button class="btn btn-secondary" @click="emit('close')">
-          Cerrar
+          Close
         </button>
       </div>
     </div>

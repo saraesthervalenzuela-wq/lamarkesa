@@ -96,7 +96,7 @@ const getSpecialCollectionLabel = (collection) => {
         <button
           :class="['toggle-btn', { active: viewMode === 'list' }]"
           @click="viewMode = 'list'"
-          title="Vista Lista"
+          title="List View"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="8" y1="6" x2="21" y2="6"/>
@@ -110,7 +110,7 @@ const getSpecialCollectionLabel = (collection) => {
         <button
           :class="['toggle-btn', { active: viewMode === 'grid' }]"
           @click="viewMode = 'grid'"
-          title="Vista Grid"
+          title="Grid View"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="3" width="7" height="7"/>
