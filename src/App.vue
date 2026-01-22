@@ -38,26 +38,26 @@ const handleLogout = async () => {
         </div>
 
         <div class="nav-links">
-          <!-- Catálogo: visible para todos -->
+          <!-- Catalog: visible for all -->
           <button
             @click="goToCatalog"
             :class="{ active: route.path === '/catalog' || route.path === '/' }"
             class="nav-btn"
           >
-            Catálogo
+            Catalog
           </button>
 
-          <!-- Editar: solo para editor y admin -->
+          <!-- Edit: only for editor and admin -->
           <button
             v-if="isEditor"
             @click="goToEdit"
             :class="{ active: route.path === '/edit' }"
             class="nav-btn"
           >
-            Editar
+            Edit
           </button>
 
-          <!-- Admin: solo para admin -->
+          <!-- Admin: only for admin -->
           <button
             v-if="isAdmin"
             @click="goToAdmin"
@@ -73,7 +73,7 @@ const handleLogout = async () => {
             @click="goToLogin"
             class="nav-btn nav-btn-login"
           >
-            Iniciar sesión
+            Sign In
           </button>
           <button
             v-else
@@ -81,7 +81,7 @@ const handleLogout = async () => {
             class="nav-btn nav-btn-logout"
             :title="user.email"
           >
-            Salir
+            Logout
           </button>
         </div>
       </div>

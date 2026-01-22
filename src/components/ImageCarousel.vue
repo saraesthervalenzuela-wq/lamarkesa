@@ -319,7 +319,7 @@ defineExpose({ handleKeydown })
 
 .size-large {
   width: 100%;
-  height: 250px;
+  height: 150px;
 }
 
 /* Navigation Arrows */

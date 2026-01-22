@@ -387,8 +387,8 @@ const getSpecialCollectionLabel = (collection) => {
 
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 25px;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 15px;
 }
 
 .grid-card {
@@ -407,6 +407,7 @@ const getSpecialCollectionLabel = (collection) => {
 .grid-image-wrapper {
   position: relative;
   width: 100%;
+  height: 150px;
 }
 
 .grid-category {
@@ -426,20 +427,20 @@ const getSpecialCollectionLabel = (collection) => {
 }
 
 .grid-info {
-  padding: 20px;
+  padding: 10px;
 }
 
 .grid-name-input {
   width: 100%;
   background: transparent;
   border: 1px solid transparent;
-  padding: 10px;
-  border-radius: 8px;
+  padding: 6px;
+  border-radius: 6px;
   font-family: 'Cormorant Garamond', serif;
-  font-size: 1.2rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: #333;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
   transition: all 0.2s;
 }
 
@@ -457,8 +458,9 @@ const getSpecialCollectionLabel = (collection) => {
 
 .grid-row {
   display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 8px;
 }
 
 .grid-sku-input {
@@ -488,12 +490,14 @@ const getSpecialCollectionLabel = (collection) => {
 .grid-category-select {
   background: transparent;
   border: 1px solid transparent;
-  padding: 8px 10px;
-  border-radius: 6px;
-  font-size: 0.8rem;
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-size: 0.7rem;
   color: #666;
   cursor: pointer;
   transition: all 0.2s;
+  flex: 1;
+  min-width: 0;
 }
 
 .grid-category-select:hover {
@@ -560,9 +564,9 @@ const getSpecialCollectionLabel = (collection) => {
   display: inline-block;
   background: #F5F5F5;
   color: #666;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-size: 0.65rem;
   font-weight: 500;
 }
 
@@ -722,6 +726,24 @@ const getSpecialCollectionLabel = (collection) => {
   }
 }
 
+@media (max-width: 1600px) {
+  .grid-container {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+@media (max-width: 1200px) {
+  .grid-container {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .grid-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 @media (max-width: 600px) {
   .table-header {
     grid-template-columns: 75px 1fr 90px 60px;
@@ -730,21 +752,21 @@ const getSpecialCollectionLabel = (collection) => {
   }
 
   .grid-container {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 15px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
   }
 
   .grid-info {
-    padding: 15px;
+    padding: 8px;
   }
 
   .grid-name-input {
-    font-size: 1rem;
+    font-size: 0.85rem;
   }
 
   .grid-row {
     flex-direction: column;
-    gap: 8px;
+    gap: 5px;
   }
 
   .grid-price-input {

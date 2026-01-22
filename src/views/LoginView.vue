@@ -21,15 +21,15 @@ const handleLogin = async () => {
   } catch (err) {
     console.error('Login error:', err)
     if (err.code === 'auth/user-not-found') {
-      error.value = 'Usuario no encontrado'
+      error.value = 'User not found'
     } else if (err.code === 'auth/wrong-password') {
-      error.value = 'Contraseña incorrecta'
+      error.value = 'Incorrect password'
     } else if (err.code === 'auth/invalid-email') {
-      error.value = 'Email inválido'
+      error.value = 'Invalid email'
     } else if (err.code === 'auth/invalid-credential') {
-      error.value = 'Credenciales inválidas'
+      error.value = 'Invalid credentials'
     } else {
-      error.value = 'Error al iniciar sesión'
+      error.value = 'Login error'
     }
   } finally {
     isLoading.value = false
@@ -43,7 +43,7 @@ const handleLogin = async () => {
       <div class="login-header">
         <span class="brand-icon">💎</span>
         <h1>La Markesa</h1>
-        <p>Iniciar sesión</p>
+        <p>Sign In</p>
       </div>
 
       <form @submit.prevent="handleLogin" class="login-form">
@@ -53,14 +53,14 @@ const handleLogin = async () => {
             id="email"
             v-model="email"
             type="email"
-            placeholder="correo@ejemplo.com"
+            placeholder="email@example.com"
             required
             :disabled="isLoading"
           />
         </div>
 
         <div class="form-group">
-          <label for="password">Contraseña</label>
+          <label for="password">Password</label>
           <input
             id="password"
             v-model="password"
@@ -76,13 +76,13 @@ const handleLogin = async () => {
         </div>
 
         <button type="submit" class="btn-login" :disabled="isLoading">
-          {{ isLoading ? 'Iniciando...' : 'Iniciar sesión' }}
+          {{ isLoading ? 'Signing in...' : 'Sign In' }}
         </button>
       </form>
 
       <div class="login-footer">
         <router-link to="/catalog" class="back-link">
-          Volver al catálogo
+          Back to catalog
         </router-link>
       </div>
     </div>
