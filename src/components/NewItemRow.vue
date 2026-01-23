@@ -38,6 +38,7 @@ const materials = [
   { value: 'hollow', label: 'Hollow Gold' },
   { value: 'vermeil', label: 'Vermeil' },
   { value: 'sterling_silver', label: '925 Sterling Silver' },
+  { value: 'rhodium_plating', label: 'Rhodium Plating' },
   { value: 'lab_grown', label: 'Lab Grown' }
 ]
 
@@ -84,11 +85,11 @@ const specialCollections = [
 const stoneTypes = [
   { value: '', label: 'No stone' },
   { value: 'cz', label: 'CZ' },
+  { value: 'zirconia', label: 'Zirconia' },
   { value: 'ruby', label: 'Ruby' },
   { value: 'emerald', label: 'Emerald' },
   { value: 'sapphire', label: 'Sapphire' },
   { value: 'amethyst', label: 'Amethyst' },
-  { value: 'rhodium_plating', label: 'Rhodium Plating' },
   { value: 'other', label: 'Other' }
 ]
 
