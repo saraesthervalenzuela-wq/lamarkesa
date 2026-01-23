@@ -16,6 +16,7 @@ const material = ref('')
 const karat = ref('')
 const goldColor = ref('')
 const stoneType = ref('')
+const rhodiumPlating = ref('')
 const specialCollection = ref('')
 const size = ref('')
 const price = ref('')
@@ -38,7 +39,6 @@ const materials = [
   { value: 'hollow', label: 'Hollow Gold' },
   { value: 'vermeil', label: 'Vermeil' },
   { value: 'sterling_silver', label: '925 Sterling Silver' },
-  { value: 'rhodium_plating', label: 'Rhodium Plating' },
   { value: 'lab_grown', label: 'Lab Grown' }
 ]
 
@@ -120,6 +120,7 @@ const addItem = () => {
     karat: karat.value,
     goldColor: goldColor.value,
     stoneType: stoneType.value,
+    rhodiumPlating: rhodiumPlating.value,
     specialCollection: specialCollection.value,
     size: size.value.trim(),
     price: parseFloat(price.value) || 0,
@@ -132,6 +133,7 @@ const addItem = () => {
   karat.value = ''
   goldColor.value = ''
   stoneType.value = ''
+  rhodiumPlating.value = ''
   specialCollection.value = ''
   size.value = ''
   price.value = ''
@@ -187,6 +189,12 @@ const handleKeypress = (event) => {
       <option v-for="st in stoneTypes" :key="st.value" :value="st.value">
         {{ st.label }}
       </option>
+    </select>
+
+    <select class="grid-select" v-model="rhodiumPlating">
+      <option value="">-</option>
+      <option value="yes">Yes</option>
+      <option value="no">No</option>
     </select>
 
     <select class="grid-select" v-model="specialCollection">
@@ -260,6 +268,13 @@ const handleKeypress = (event) => {
       <option v-for="st in stoneTypes" :key="st.value" :value="st.value">
         {{ st.label }}
       </option>
+    </select>
+
+    <!-- Rhodium Plating -->
+    <select class="rhodium-select" v-model="rhodiumPlating">
+      <option value="">-</option>
+      <option value="yes">Yes</option>
+      <option value="no">No</option>
     </select>
 
     <!-- Special Collection -->
@@ -374,7 +389,7 @@ const handleKeypress = (event) => {
 /* List Mode (Table Row) Styles */
 .new-row {
   display: grid;
-  grid-template-columns: 120px minmax(180px, 1.5fr) 120px 130px 80px 110px 130px 70px 90px 90px;
+  grid-template-columns: 120px minmax(180px, 1.5fr) 120px 130px 80px 110px 80px 130px 70px 90px 90px;
   gap: 12px;
   padding: 18px 25px;
   background: linear-gradient(135deg, #FDFAF6 0%, #FAF7F2 100%);
@@ -486,7 +501,8 @@ const handleKeypress = (event) => {
 .material-select,
 .karat-select,
 .color-select,
-.stone-select {
+.stone-select,
+.rhodium-select {
   background: #fff;
   border: 1px solid #E8E8E8;
   padding: 8px 10px;

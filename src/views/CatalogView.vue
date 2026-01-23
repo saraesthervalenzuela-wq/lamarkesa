@@ -52,7 +52,6 @@ const materials = [
   { value: 'hollow', label: 'Hollow Gold' },
   { value: 'vermeil', label: 'Vermeil' },
   { value: 'sterling_silver', label: '925 Sterling Silver' },
-  { value: 'rhodium_plating', label: 'Rhodium Plating' },
   { value: 'lab_grown', label: 'Lab Grown' }
 ]
 

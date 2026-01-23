@@ -47,7 +47,6 @@ const materials = [
   { value: 'hollow', label: 'Hollow Gold' },
   { value: 'vermeil', label: 'Vermeil' },
   { value: 'sterling_silver', label: '925 Sterling Silver' },
-  { value: 'rhodium_plating', label: 'Rhodium Plating' },
   { value: 'lab_grown', label: 'Lab Grown' }
 ]
 
@@ -131,6 +130,7 @@ const getSpecialCollectionLabel = (collection) => {
         <div>Material</div>
         <div>Karat</div>
         <div>Color</div>
+        <div>Rhodium</div>
         <div>Collection</div>
         <div>Size</div>
         <div>Price</div>
@@ -330,7 +330,7 @@ const getSpecialCollectionLabel = (collection) => {
 
 .table-header {
   display: grid;
-  grid-template-columns: 110px minmax(150px, 1.5fr) 100px 120px 70px 100px 120px 60px 80px 100px;
+  grid-template-columns: 110px minmax(150px, 1.5fr) 100px 120px 70px 100px 80px 120px 60px 80px 100px;
   gap: 12px;
   padding: 18px 20px;
   background: linear-gradient(135deg, #FDFAF6 0%, #FAF7F2 100%);

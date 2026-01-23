@@ -40,7 +40,6 @@ const materials = [
   { value: 'hollow', label: 'Hollow Gold' },
   { value: 'vermeil', label: 'Vermeil' },
   { value: 'sterling_silver', label: '925 Sterling Silver' },
-  { value: 'rhodium_plating', label: 'Rhodium Plating' },
   { value: 'lab_grown', label: 'Lab Grown' }
 ]
 
@@ -208,6 +207,17 @@ const confirmDelete = () => {
     </select>
     <div v-else class="placeholder-cell">-</div>
 
+    <!-- Rhodium Plating -->
+    <select
+      class="rhodium-select"
+      :value="item.rhodiumPlating || ''"
+      @change="emit('update', 'rhodiumPlating', $event.target.value)"
+    >
+      <option value="">-</option>
+      <option value="yes">Yes</option>
+      <option value="no">No</option>
+    </select>
+
     <!-- Special Collection -->
     <select
       class="collection-select"
@@ -247,7 +257,7 @@ const confirmDelete = () => {
 <style scoped>
 .table-row {
   display: grid;
-  grid-template-columns: 110px minmax(150px, 1.5fr) 100px 120px 70px 100px 120px 60px 80px 100px;
+  grid-template-columns: 110px minmax(150px, 1.5fr) 100px 120px 70px 100px 80px 120px 60px 80px 100px;
   gap: 12px;
   padding: 16px 20px;
   border-bottom: 1px solid #F0F0F0;
@@ -365,7 +375,8 @@ const confirmDelete = () => {
 .material-select,
 .karat-select,
 .color-select,
-.stone-select {
+.stone-select,
+.rhodium-select {
   background: transparent;
   border: 1px solid transparent;
   padding: 8px 10px;
@@ -379,7 +390,8 @@ const confirmDelete = () => {
 .material-select:hover,
 .karat-select:hover,
 .color-select:hover,
-.stone-select:hover {
+.stone-select:hover,
+.rhodium-select:hover {
   background: #FAFAFA;
   border-color: #E8E8E8;
 }
@@ -387,7 +399,8 @@ const confirmDelete = () => {
 .material-select:focus,
 .karat-select:focus,
 .color-select:focus,
-.stone-select:focus {
+.stone-select:focus,
+.rhodium-select:focus {
   outline: none;
   background: #fff;
   border-color: #B79848;
@@ -397,7 +410,8 @@ const confirmDelete = () => {
 .material-select option,
 .karat-select option,
 .color-select option,
-.stone-select option {
+.stone-select option,
+.rhodium-select option {
   background: #fff;
   color: #333;
 }
