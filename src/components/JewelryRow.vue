@@ -40,8 +40,7 @@ const materials = [
   { value: 'hollow', label: 'Hollow Gold' },
   { value: 'vermeil', label: 'Vermeil' },
   { value: 'sterling_silver', label: '925 Sterling Silver' },
-  { value: 'lab_grown', label: 'Lab Grown' },
-  { value: 'rhodium_plating', label: 'Rhodium Plating' }
+  { value: 'lab_grown', label: 'Lab Grown' }
 ]
 
 // Karats based on material
@@ -58,12 +57,6 @@ const karatOptions = {
     { value: '18k', label: '18k' }
   ],
   vermeil: [
-    { value: '', label: 'No karat' },
-    { value: '10k', label: '10k' },
-    { value: '14k', label: '14k' },
-    { value: '18k', label: '18k' }
-  ],
-  rhodium_plating: [
     { value: '', label: 'No karat' },
     { value: '10k', label: '10k' },
     { value: '14k', label: '14k' },
@@ -97,13 +90,14 @@ const stoneTypes = [
   { value: 'emerald', label: 'Emerald' },
   { value: 'sapphire', label: 'Sapphire' },
   { value: 'amethyst', label: 'Amethyst' },
+  { value: 'rhodium_plating', label: 'Rhodium Plating' },
   { value: 'other', label: 'Other' }
 ]
 
 // Computed properties for showing/hiding fields
 const showKarat = computed(() => {
   const mat = props.item.material
-  return mat === 'solid_gold' || mat === 'hollow' || mat === 'vermeil' || mat === 'rhodium_plating'
+  return mat === 'solid_gold' || mat === 'hollow' || mat === 'vermeil'
 })
 
 const showGoldColor = computed(() => {
@@ -111,7 +105,7 @@ const showGoldColor = computed(() => {
 })
 
 const showStoneType = computed(() => {
-  return props.item.material === 'vermeil'
+  return props.item.material === 'vermeil' || props.item.material === 'sterling_silver'
 })
 
 const availableKarats = computed(() => {
