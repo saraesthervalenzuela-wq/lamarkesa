@@ -170,7 +170,8 @@ const handleKeypress = (event) => {
       </option>
     </select>
 
-    <select v-if="showKarat" class="grid-select" v-model="karat">
+    <select class="grid-select" v-model="karat">
+      <option value="">-</option>
       <option v-for="k in availableKarats" :key="k.value" :value="k.value">
         {{ k.label }}
       </option>
@@ -181,8 +182,8 @@ const handleKeypress = (event) => {
         {{ gc.label }}
       </option>
     </select>
-
-    <select v-if="showStoneType" class="grid-select" v-model="stoneType">
+    <select v-else class="grid-select" v-model="stoneType">
+      <option value="">-</option>
       <option v-for="st in stoneTypes" :key="st.value" :value="st.value">
         {{ st.label }}
       </option>
@@ -241,23 +242,21 @@ const handleKeypress = (event) => {
     </select>
 
     <!-- Karat -->
-    <select v-if="showKarat" class="karat-select" v-model="karat">
+    <select class="karat-select" v-model="karat">
+      <option value="">-</option>
       <option v-for="k in availableKarats" :key="k.value" :value="k.value">
         {{ k.label }}
       </option>
     </select>
-    <div v-else class="placeholder-cell">-</div>
 
-    <!-- Gold Color -->
+    <!-- Gold Color / Stone Type -->
     <select v-if="showGoldColor" class="color-select" v-model="goldColor">
       <option v-for="gc in goldColors" :key="gc.value" :value="gc.value">
         {{ gc.label }}
       </option>
     </select>
-    <div v-else-if="!showStoneType" class="placeholder-cell">-</div>
-
-    <!-- Stone Type (for Vermeil) -->
-    <select v-if="showStoneType" class="stone-select" v-model="stoneType">
+    <select v-else class="stone-select" v-model="stoneType">
+      <option value="">-</option>
       <option v-for="st in stoneTypes" :key="st.value" :value="st.value">
         {{ st.label }}
       </option>
