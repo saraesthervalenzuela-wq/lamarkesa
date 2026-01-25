@@ -1,4 +1,4 @@
-name: Railway PostgreSQL Backup
+name: Firebase Firestore Backup
 
 on:
   schedule:
@@ -23,7 +23,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup backup branch
         run: |
@@ -34,20 +33,30 @@ jobs:
           if git ls-remote --heads origin ${{ env.BACKUP_BRANCH }} | grep -q ${{ env.BACKUP_BRANCH }}; then
             git fetch origin ${{ env.BACKUP_BRANCH }}
             git checkout ${{ env.BACKUP_BRANCH }}
+            # Traer el script de backup de main
+            git checkout main -- scripts/firebase-backup.mjs package.json
           else
             git checkout --orphan ${{ env.BACKUP_BRANCH }}
             git rm -rf . || true
-            echo "# Railway Backups" > README.md
+            git checkout main -- scripts/firebase-backup.mjs package.json
+            echo "# Firebase Backups" > README.md
             echo "" >> README.md
-            echo "Este branch contiene backups automáticos de PostgreSQL." >> README.md
+            echo "Este branch contiene backups automáticos de Firestore." >> README.md
             echo "" >> README.md
             echo "## Estructura" >> README.md
-            echo "- \`backup_YYYY-MM-DD_HH-MM-SS_UTC_postgres.sql.gz\` - Dump de PostgreSQL" >> README.md
-            echo "- \`backup_YYYY-MM-DD_HH-MM-SS_UTC_env.json\` - Variables de entorno" >> README.md
+            echo "- \`backup_YYYY-MM-DD_HH-MM-SS_UTC_firestore.json.gz\` - Datos de Firestore" >> README.md
             git add README.md
             git commit -m "Initialize backups branch"
             git push -u origin ${{ env.BACKUP_BRANCH }}
           fi
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install firebase-admin
 
       - name: Generate timestamp
         id: timestamp
@@ -56,73 +65,27 @@ jobs:
           echo "timestamp=${TIMESTAMP}" >> $GITHUB_OUTPUT
           echo "Timestamp: ${TIMESTAMP}"
 
-      - name: Install PostgreSQL client
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y postgresql-client
-
-      - name: Check DATABASE_URL is configured
+      - name: Check FIREBASE_SERVICE_ACCOUNT_KEY is configured
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          FIREBASE_SERVICE_ACCOUNT_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
         run: |
-          if [ -z "${DATABASE_URL}" ]; then
-            echo "::error::DATABASE_URL secret is not configured!"
+          if [ -z "${FIREBASE_SERVICE_ACCOUNT_KEY}" ]; then
+            echo "::error::FIREBASE_SERVICE_ACCOUNT_KEY secret is not configured!"
             echo ""
-            echo "Please add DATABASE_URL to your repository secrets:"
-            echo "  1. Go to Settings → Secrets and variables → Actions"
-            echo "  2. Click 'New repository secret'"
-            echo "  3. Name: DATABASE_URL"
-            echo "  4. Value: Your Railway PostgreSQL connection string"
+            echo "To generate a service account key:"
+            echo "  1. Go to Firebase Console → Project Settings → Service Accounts"
+            echo "  2. Click 'Generate new private key'"
+            echo "  3. Copy the entire JSON content"
+            echo "  4. Add it as FIREBASE_SERVICE_ACCOUNT_KEY in GitHub Secrets"
             exit 1
           fi
-          echo "DATABASE_URL is configured ✓"
+          echo "FIREBASE_SERVICE_ACCOUNT_KEY is configured ✓"
 
-      - name: Create PostgreSQL dump
+      - name: Create Firestore backup
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: |
-          BACKUP_NAME="backup_${{ steps.timestamp.outputs.timestamp }}"
-
-          echo "Creating PostgreSQL dump..."
-          pg_dump "${DATABASE_URL}" --no-owner --no-acl | gzip > "${BACKUP_NAME}_postgres.sql.gz"
-
-          # Verificar que el archivo no está vacío
-          if [ ! -s "${BACKUP_NAME}_postgres.sql.gz" ]; then
-            echo "ERROR: Backup file is empty!"
-            exit 1
-          fi
-
-          ls -lh "${BACKUP_NAME}_postgres.sql.gz"
-
-      - name: Export environment variables
-        env:
-          RAILWAY_PROJECT_NAME: ${{ secrets.RAILWAY_PROJECT_NAME }}
-          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
-          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
-          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
-          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
-          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
-          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
-        run: |
-          BACKUP_NAME="backup_${{ steps.timestamp.outputs.timestamp }}"
-          TIMESTAMP="${{ steps.timestamp.outputs.timestamp }}"
-
-          cat > "${BACKUP_NAME}_env.json" << EOF
-          {
-            "timestamp": "${TIMESTAMP}",
-            "railway_project": "${RAILWAY_PROJECT_NAME:-lamarkesa}",
-            "environment": "production",
-            "variables": {
-              "DATABASE_URL": "[REDACTED - stored in GitHub Secrets]",
-              "VITE_FIREBASE_API_KEY": "${VITE_FIREBASE_API_KEY:-}",
-              "VITE_FIREBASE_AUTH_DOMAIN": "${VITE_FIREBASE_AUTH_DOMAIN:-}",
-              "VITE_FIREBASE_PROJECT_ID": "${VITE_FIREBASE_PROJECT_ID:-}",
-              "VITE_FIREBASE_STORAGE_BUCKET": "${VITE_FIREBASE_STORAGE_BUCKET:-}",
-              "VITE_FIREBASE_MESSAGING_SENDER_ID": "${VITE_FIREBASE_MESSAGING_SENDER_ID:-}",
-              "VITE_FIREBASE_APP_ID": "${VITE_FIREBASE_APP_ID:-}"
-            }
-          }
-          EOF
+          FIREBASE_SERVICE_ACCOUNT_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
+          BACKUP_TIMESTAMP: ${{ steps.timestamp.outputs.timestamp }}
+        run: node scripts/firebase-backup.mjs
 
       - name: Rotate old backups (>14 days)
         run: |
@@ -131,7 +94,7 @@ jobs:
           CURRENT_DATE=$(date +%s)
           DELETED=0
 
-          for file in backup_*.sql.gz backup_*.json; do
+          for file in backup_*.json.gz; do
             if [ -f "$file" ]; then
               # Extraer fecha del nombre (formato: backup_YYYY-MM-DD_...)
               FILE_DATE=$(echo "$file" | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}' | head -1)
@@ -142,7 +105,7 @@ jobs:
 
                 if [ "$AGE_DAYS" -gt "${{ env.RETENTION_DAYS }}" ]; then
                   echo "Deleting: $file (${AGE_DAYS} days old)"
-                  git rm "$file" || rm "$file"
+                  git rm "$file" 2>/dev/null || rm "$file"
                   DELETED=$((DELETED + 1))
                 fi
               fi
@@ -155,7 +118,10 @@ jobs:
         run: |
           BACKUP_NAME="backup_${{ steps.timestamp.outputs.timestamp }}"
 
-          git add "${BACKUP_NAME}_postgres.sql.gz" "${BACKUP_NAME}_env.json" || true
+          # Limpiar archivos temporales de npm
+          rm -rf node_modules package.json package-lock.json scripts 2>/dev/null || true
+
+          git add "${BACKUP_NAME}_firestore.json.gz" || true
           git add -A  # Include any deleted files from rotation
 
           if git diff --staged --quiet; then
@@ -174,11 +140,8 @@ jobs:
           echo "Timestamp: ${{ steps.timestamp.outputs.timestamp }}"
           echo "Branch: ${{ env.BACKUP_BRANCH }}"
           echo ""
-          echo "Files created:"
-          echo "  - backup_${{ steps.timestamp.outputs.timestamp }}_postgres.sql.gz"
-          echo "  - backup_${{ steps.timestamp.outputs.timestamp }}_env.json"
+          echo "File created:"
+          echo "  - backup_${{ steps.timestamp.outputs.timestamp }}_firestore.json.gz"
           echo ""
-          echo "To restore this backup:"
-          echo "  git checkout ${{ env.BACKUP_BRANCH }}"
-          echo "  gunzip -c backup_${{ steps.timestamp.outputs.timestamp }}_postgres.sql.gz | psql \$DATABASE_URL"
+          echo "To restore, see scripts/firebase-restore.mjs"
           echo "=========================================="
