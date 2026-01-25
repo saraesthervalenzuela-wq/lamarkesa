@@ -7,6 +7,9 @@ on:
   workflow_dispatch:
     # Permite ejecución manual desde GitHub UI
 
+permissions:
+  contents: write
+
 env:
   RETENTION_DAYS: 14
   BACKUP_BRANCH: backups
@@ -57,6 +60,22 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y postgresql-client
+
+      - name: Check DATABASE_URL is configured
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          if [ -z "${DATABASE_URL}" ]; then
+            echo "::error::DATABASE_URL secret is not configured!"
+            echo ""
+            echo "Please add DATABASE_URL to your repository secrets:"
+            echo "  1. Go to Settings → Secrets and variables → Actions"
+            echo "  2. Click 'New repository secret'"
+            echo "  3. Name: DATABASE_URL"
+            echo "  4. Value: Your Railway PostgreSQL connection string"
+            exit 1
+          fi
+          echo "DATABASE_URL is configured ✓"
 
       - name: Create PostgreSQL dump
         env:
