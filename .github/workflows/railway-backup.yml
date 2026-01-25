@@ -1,0 +1,165 @@
+name: Railway PostgreSQL Backup
+
+on:
+  schedule:
+    # Ejecutar diariamente a las 3:00 AM UTC
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+    # Permite ejecución manual desde GitHub UI
+
+env:
+  RETENTION_DAYS: 14
+  BACKUP_BRANCH: backups
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup backup branch
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+
+          # Crear o cambiar a la rama de backups
+          if git ls-remote --heads origin ${{ env.BACKUP_BRANCH }} | grep -q ${{ env.BACKUP_BRANCH }}; then
+            git fetch origin ${{ env.BACKUP_BRANCH }}
+            git checkout ${{ env.BACKUP_BRANCH }}
+          else
+            git checkout --orphan ${{ env.BACKUP_BRANCH }}
+            git rm -rf . || true
+            echo "# Railway Backups" > README.md
+            echo "" >> README.md
+            echo "Este branch contiene backups automáticos de PostgreSQL." >> README.md
+            echo "" >> README.md
+            echo "## Estructura" >> README.md
+            echo "- \`backup_YYYY-MM-DD_HH-MM-SS_UTC_postgres.sql.gz\` - Dump de PostgreSQL" >> README.md
+            echo "- \`backup_YYYY-MM-DD_HH-MM-SS_UTC_env.json\` - Variables de entorno" >> README.md
+            git add README.md
+            git commit -m "Initialize backups branch"
+            git push -u origin ${{ env.BACKUP_BRANCH }}
+          fi
+
+      - name: Generate timestamp
+        id: timestamp
+        run: |
+          TIMESTAMP=$(date -u +"%Y-%m-%d_%H-%M-%S_UTC")
+          echo "timestamp=${TIMESTAMP}" >> $GITHUB_OUTPUT
+          echo "Timestamp: ${TIMESTAMP}"
+
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Create PostgreSQL dump
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          BACKUP_NAME="backup_${{ steps.timestamp.outputs.timestamp }}"
+
+          echo "Creating PostgreSQL dump..."
+          pg_dump "${DATABASE_URL}" --no-owner --no-acl | gzip > "${BACKUP_NAME}_postgres.sql.gz"
+
+          # Verificar que el archivo no está vacío
+          if [ ! -s "${BACKUP_NAME}_postgres.sql.gz" ]; then
+            echo "ERROR: Backup file is empty!"
+            exit 1
+          fi
+
+          ls -lh "${BACKUP_NAME}_postgres.sql.gz"
+
+      - name: Export environment variables
+        env:
+          RAILWAY_PROJECT_NAME: ${{ secrets.RAILWAY_PROJECT_NAME }}
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+        run: |
+          BACKUP_NAME="backup_${{ steps.timestamp.outputs.timestamp }}"
+          TIMESTAMP="${{ steps.timestamp.outputs.timestamp }}"
+
+          cat > "${BACKUP_NAME}_env.json" << EOF
+          {
+            "timestamp": "${TIMESTAMP}",
+            "railway_project": "${RAILWAY_PROJECT_NAME:-lamarkesa}",
+            "environment": "production",
+            "variables": {
+              "DATABASE_URL": "[REDACTED - stored in GitHub Secrets]",
+              "VITE_FIREBASE_API_KEY": "${VITE_FIREBASE_API_KEY:-}",
+              "VITE_FIREBASE_AUTH_DOMAIN": "${VITE_FIREBASE_AUTH_DOMAIN:-}",
+              "VITE_FIREBASE_PROJECT_ID": "${VITE_FIREBASE_PROJECT_ID:-}",
+              "VITE_FIREBASE_STORAGE_BUCKET": "${VITE_FIREBASE_STORAGE_BUCKET:-}",
+              "VITE_FIREBASE_MESSAGING_SENDER_ID": "${VITE_FIREBASE_MESSAGING_SENDER_ID:-}",
+              "VITE_FIREBASE_APP_ID": "${VITE_FIREBASE_APP_ID:-}"
+            }
+          }
+          EOF
+
+      - name: Rotate old backups (>14 days)
+        run: |
+          echo "Checking for backups older than ${{ env.RETENTION_DAYS }} days..."
+
+          CURRENT_DATE=$(date +%s)
+          DELETED=0
+
+          for file in backup_*.sql.gz backup_*.json; do
+            if [ -f "$file" ]; then
+              # Extraer fecha del nombre (formato: backup_YYYY-MM-DD_...)
+              FILE_DATE=$(echo "$file" | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}' | head -1)
+
+              if [ -n "$FILE_DATE" ]; then
+                FILE_EPOCH=$(date -d "$FILE_DATE" +%s)
+                AGE_DAYS=$(( (CURRENT_DATE - FILE_EPOCH) / 86400 ))
+
+                if [ "$AGE_DAYS" -gt "${{ env.RETENTION_DAYS }}" ]; then
+                  echo "Deleting: $file (${AGE_DAYS} days old)"
+                  git rm "$file" || rm "$file"
+                  DELETED=$((DELETED + 1))
+                fi
+              fi
+            fi
+          done
+
+          echo "Deleted $DELETED old backup files"
+
+      - name: Commit and push backup
+        run: |
+          BACKUP_NAME="backup_${{ steps.timestamp.outputs.timestamp }}"
+
+          git add "${BACKUP_NAME}_postgres.sql.gz" "${BACKUP_NAME}_env.json" || true
+          git add -A  # Include any deleted files from rotation
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Backup: ${{ steps.timestamp.outputs.timestamp }}"
+            git push origin ${{ env.BACKUP_BRANCH }}
+          fi
+
+      - name: Backup summary
+        run: |
+          echo "=========================================="
+          echo "Backup completed successfully!"
+          echo "=========================================="
+          echo ""
+          echo "Timestamp: ${{ steps.timestamp.outputs.timestamp }}"
+          echo "Branch: ${{ env.BACKUP_BRANCH }}"
+          echo ""
+          echo "Files created:"
+          echo "  - backup_${{ steps.timestamp.outputs.timestamp }}_postgres.sql.gz"
+          echo "  - backup_${{ steps.timestamp.outputs.timestamp }}_env.json"
+          echo ""
+          echo "To restore this backup:"
+          echo "  git checkout ${{ env.BACKUP_BRANCH }}"
+          echo "  gunzip -c backup_${{ steps.timestamp.outputs.timestamp }}_postgres.sql.gz | psql \$DATABASE_URL"
+          echo "=========================================="
