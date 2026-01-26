@@ -14,7 +14,10 @@ const {
   addJewelry,
   updateJewelry,
   deleteJewelry,
-  uploadImage
+  uploadImage,
+  addImagesToJewelry,
+  removeImageFromJewelry,
+  getImages
 } = useJewelry()
 
 onMounted(() => {
@@ -53,6 +56,26 @@ const handleUploadImage = async (id, file) => {
     alert('Error uploading image: ' + error.message)
   }
 }
+
+const handleAddImages = async (id, files) => {
+  try {
+    const item = filteredJewelry.value.find(j => j.id === id)
+    const currentImages = getImages(item) || []
+    await addImagesToJewelry(id, files, currentImages)
+  } catch (error) {
+    alert('Error uploading images: ' + error.message)
+  }
+}
+
+const handleDeleteImage = async (id, imageIndex) => {
+  try {
+    const item = filteredJewelry.value.find(j => j.id === id)
+    const currentImages = getImages(item)
+    await removeImageFromJewelry(id, imageIndex, currentImages)
+  } catch (error) {
+    alert('Error deleting image: ' + error.message)
+  }
+}
 </script>
 
 <template>
@@ -75,6 +98,8 @@ const handleUploadImage = async (id, file) => {
       @update="handleUpdate"
       @delete="handleDelete"
       @upload-image="handleUploadImage"
+      @add-images="handleAddImages"
+      @delete-image="handleDeleteImage"
     />
   </div>
 </template>
