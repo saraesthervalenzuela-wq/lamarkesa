@@ -10,6 +10,48 @@ defineProps({
 
 const emit = defineEmits(['add'])
 
+// Image upload
+const fileInput = ref(null)
+const selectedImage = ref(null)
+const imagePreview = ref('')
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
+const ACCEPTED_FORMATS = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/heic', 'image/heif']
+
+const openFilePicker = () => {
+  fileInput.value?.click()
+}
+
+const handleFileSelect = (event) => {
+  const file = event.target.files?.[0]
+  if (!file) return
+
+  // Validate format
+  if (!ACCEPTED_FORMATS.includes(file.type)) {
+    alert('Formato no soportado. Usa: JPEG, PNG, WebP, GIF o HEIC')
+    event.target.value = ''
+    return
+  }
+
+  // Validate size
+  if (file.size > MAX_FILE_SIZE) {
+    alert('La imagen es muy grande. Máximo 10MB')
+    event.target.value = ''
+    return
+  }
+
+  selectedImage.value = file
+  imagePreview.value = URL.createObjectURL(file)
+}
+
+const clearImage = () => {
+  selectedImage.value = null
+  imagePreview.value = ''
+  if (fileInput.value) {
+    fileInput.value.value = ''
+  }
+}
+
 const name = ref('')
 const category = ref('rings')
 const material = ref('')
@@ -124,7 +166,8 @@ const addItem = () => {
     specialCollection: specialCollection.value,
     size: size.value.trim(),
     price: parseFloat(price.value) || 0,
-    image: ''
+    image: '',
+    _pendingImage: selectedImage.value // Pass the file to upload after creation
   })
 
   // Reset form
@@ -137,6 +180,7 @@ const addItem = () => {
   specialCollection.value = ''
   size.value = ''
   price.value = ''
+  clearImage()
 }
 
 const handleKeypress = (event) => {
@@ -147,9 +191,25 @@ const handleKeypress = (event) => {
 </script>
 
 <template>
+  <!-- Hidden file input (shared) -->
+  <input
+    ref="fileInput"
+    type="file"
+    accept="image/jpeg,image/png,image/webp,image/gif,image/heic,image/heif"
+    class="hidden-input"
+    @change="handleFileSelect"
+  />
+
   <!-- Grid Mode -->
   <div v-if="gridMode" class="grid-add-form">
-    <div class="grid-add-icon">+</div>
+    <div class="grid-image-upload" @click="openFilePicker" title="Click para agregar imagen">
+      <img v-if="imagePreview" :src="imagePreview" alt="Preview" class="grid-image-preview" />
+      <template v-else>
+        <div class="grid-add-icon">+</div>
+        <span class="grid-upload-hint">Agregar foto</span>
+      </template>
+      <button v-if="imagePreview" class="grid-clear-btn" @click.stop="clearImage" title="Quitar imagen">×</button>
+    </div>
     <h4>Add Product</h4>
 
     <input
@@ -226,7 +286,11 @@ const handleKeypress = (event) => {
 
   <!-- List Mode (Table Row) -->
   <div v-else class="new-row">
-    <button class="add-btn" @click="addItem" title="Add new item">+</button>
+    <div class="image-upload-area" @click="openFilePicker" title="Click para agregar imagen">
+      <img v-if="imagePreview" :src="imagePreview" alt="Preview" class="image-preview" />
+      <span v-else class="upload-icon">+</span>
+      <button v-if="imagePreview" class="clear-image-btn" @click.stop="clearImage" title="Quitar imagen">×</button>
+    </div>
 
     <input
       type="text"
@@ -608,5 +672,130 @@ const handleKeypress = (event) => {
   .grid-add-form {
     padding: 20px 15px;
   }
+
+  .image-upload-area {
+    width: 70px;
+    height: 70px;
+  }
+}
+
+/* Hidden file input */
+.hidden-input {
+  display: none;
+}
+
+/* Image upload area - List mode */
+.image-upload-area {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  border-radius: 10px;
+  border: 2px dashed rgba(183, 152, 72, 0.4);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.image-upload-area:hover {
+  background: rgba(183, 152, 72, 0.08);
+  border-style: solid;
+  border-color: #B79848;
+}
+
+.upload-icon {
+  font-size: 2rem;
+  color: #B79848;
+}
+
+.image-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.clear-image-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(220, 53, 69, 0.9);
+  color: white;
+  border: none;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.clear-image-btn:hover {
+  background: #dc3545;
+  transform: scale(1.1);
+}
+
+/* Grid mode image upload */
+.grid-image-upload {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 12px;
+  border: 2px dashed rgba(183, 152, 72, 0.4);
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.grid-image-upload:hover {
+  background: rgba(183, 152, 72, 0.08);
+  border-color: #B79848;
+}
+
+.grid-image-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.grid-upload-hint {
+  font-size: 0.7rem;
+  color: #999;
+  margin-top: 4px;
+}
+
+.grid-clear-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(220, 53, 69, 0.9);
+  color: white;
+  border: none;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.grid-clear-btn:hover {
+  background: #dc3545;
 }
 </style>

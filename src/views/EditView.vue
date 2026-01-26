@@ -26,7 +26,15 @@ onMounted(() => {
 
 const handleAdd = async (item) => {
   try {
-    await addJewelry(item)
+    const pendingImage = item._pendingImage
+    delete item._pendingImage // Remove before saving to DB
+
+    const newId = await addJewelry(item)
+
+    // If there's a pending image, upload it
+    if (pendingImage && newId) {
+      await addImagesToJewelry(newId, [pendingImage], [])
+    }
   } catch (error) {
     alert('Error adding item: ' + error.message)
   }
