@@ -90,10 +90,7 @@ const analyzeWithAI = async () => {
   parsedItems.value = []
 
   try {
-    // Usar función serverless de Netlify (en producción) o localhost (en desarrollo)
-    const apiUrl = import.meta.env.DEV
-      ? 'http://localhost:8888/.netlify/functions/openai'
-      : '/.netlify/functions/openai'
+    const apiUrl = '/api/openai'
 
     const response = await fetch(apiUrl, {
       method: 'POST',

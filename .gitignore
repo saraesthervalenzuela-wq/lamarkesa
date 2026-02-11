@@ -30,3 +30,4 @@ dist-ssr
 # Photos folder (too large for git)
 photos/*
 !photos/.gitkeep
+.firebase/
